@@ -1,0 +1,10 @@
+Package: oncoPrintr
+Type: Package
+Title: Create oncoPrints Based on Genomic Data
+Version: 0.1
+Date: 2015-05-25
+Author: Ahmet Zehir
+Maintainer: Ahmet Zehir <ahmetzehir@gmail.com>
+Description: Create oncoPrints with your own genomic data (Mutations, Copy number Alterations, Annotations)
+License: What license is it under?
+LazyData: TRUE

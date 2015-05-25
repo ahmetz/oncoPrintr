@@ -1,0 +1,446 @@
+#' oncoPrint
+#'
+#' @param df  this is the dataframe used to plot oncoprints. required colnames: Mnumber, Gene, VarClass
+#' @param sort Boelean indicating whether genes should be sorted or now (default: True)
+#' @param convert Boelean indicating whether varclasses should be converted to more standard names (default: True)
+#' @param total_samples Total number of samples. If not given, total row numbers of input will be used
+#' @param geneName IF given, this gene sits on top of the oncoprint, it won't be used in sorting
+#' @param annotations If given, these will be used for pre-clustering
+#' @param annotation_order a list of annotation items to be displayed
+#' @param merge_scnas Bolean indicating whether to plot scnas and mutations together superimposed (default: False)
+#' @param second_df if merge_scnas is True, this is the second set of events to be merged
+#' @param alteration_score this list determines the relative importance of different genomic alterations. Amplification > Deletion > Mutations etc.
+#'
+#' @return oncoPrint image
+#' @export
+#'
+#' @examples TODO
+
+oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, alteration_score = list(Amplification = 3, Deletion = 3, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0)) {
+  # This is the plotting function
+
+
+
+  # this will merge two matrices of event matrixes. mutations and copy number changes
+
+  paste.matrix <- function(M1, M2){
+    rownames1 <- row.names(M1)
+    rownames2 <- row.names(M2)
+    colnames1 <- colnames(M1)
+    colnames2 <- colnames(M2)
+    row_names_all <- unique(c(rownames1, rownames2))
+    col_names_all <- unique(c(colnames1, colnames2))
+
+    n = length(row_names_all)
+    m = length(col_names_all)
+    ret <- matrix(rep(NA, n *m), ncol = m)
+    colnames(ret) <- col_names_all
+    row.names(ret) <- row_names_all
+
+    for(row in row_names_all){
+      for(col in col_names_all){
+        x = NA
+        y = NA
+        if(row %in% rownames1 && col %in% colnames1){
+          x = M1[row, col]
+        }
+        if(row %in% rownames2 && col %in% colnames2){
+          y = M2[row, col]
+        }
+
+        if(is.na(x) && is.na(y)){
+          ret[row, col] <- NA
+        }else if(is.na(x) && !is.na(y)){
+          ret[row, col] <- y
+        }else if(!is.na(x) && is.na(y)){
+          ret[row, col]<- x
+        }else if(!is.na(x) && !is.na(y)){
+          ret[row, col] <- paste(x, y, sep=",")
+        }
+      }
+    }
+    ret <- as.matrix(ret)
+    colnames(ret) <- col_names_all
+    row.names(ret) <- row_names_all
+    return(ret)
+  }
+
+  remove_duplicates <- function(df){
+    choose_alteration_type <- function(x){
+      for (i in 1:length(x)){
+        #cat(x[i, ]$Gene, ":", x[i, ], ":", i)
+        if(grepl("stopgain", x[i])){
+          return(x[grep("stopgain", x[i])])
+        }else if(grepl("insertion", x[i])){
+          return(x[grep("insertion", x[i])])
+        }else if(grepl("deletion", x[i])){
+          return(x[grep("deletion", x[i]) ])
+        }else if(grepl("splicing", x[i])){
+          return(x[grep("splicing", x[i]) ])
+        }else if(grepl("nonsynonymous", x[i])){
+          return(x[grep("nonsynonymous", x[i]) ])
+        }else if(grepl("upstream", x[i])){
+          return(x[grep("upstream", x[i]) ])
+        }else if(grepl("Amplification", x[i])){
+          return(x[grep("Amplification", x[i]) ])
+        }else if(grepl("IntragenicDeletion", x[i])){
+          return(x[grep("IntragenicDeletion", x[i]) ])
+        }else if(grepl("Deletion", x[i])){
+          return(x[grep("Deletion", x[i]) ])
+        }else if(grepl("Present", x[i])){
+          return(x[grep("Present", x[i]) ])
+        }else if(grepl("NotTested", x[i])){
+          return(x[grep("NotTested", x[i]) ])
+        }
+      }
+    }
+    df %>% group_by(Gene, Mnumber) %>% summarise(VarClass = choose_alteration_type(VarClass))
+  }
+
+
+  # check if there are any samples with no alterations. If so, remove them to add later on.
+  # These will have VarClass = "None"
+  not_altered_sample_num <- NA
+  not_altered_sample_names <- NA
+  if(nrow(df %>% filter(VarClass == "None")) > 0){
+    not_altered_sample_num <- nrow(df %>% filter(VarClass == "None"))
+    not_altered_sample_names <- df %>% filter(VarClass == "None") %>% select(Mnumber)
+    df <- df %>% filter(VarClass != "None")
+  }
+
+
+  #remove duplicates of gene events within the same sample.
+  #TO-DO do not remove if a gene has both a copy number alteration and a mutation
+  df <- remove_duplicates(df)
+  if(merge_scnas){
+    df2 <- remove_duplicates(df2)
+  }
+  convert_varclass <- function(df){
+    if (sum(grepl("splicing", df$VarClass) > 0)){
+      df[grep("splicing", df$VarClass), ]["VarClass"] <- "Splicing"
+    }
+    if(sum(grepl("stop", df$VarClass) > 0)){
+      df[grep("stop", df$VarClass), ]["VarClass"] <- "Nonsense"
+    }
+    if(sum(grepl("nonsynonymous", df$VarClass) > 0)){
+      df[grep("nonsynonymous", df$VarClass), ]["VarClass"] <- "Missense"
+    }
+    if(sum(grepl("frameshift", df$VarClass) > 0)){
+      df[grep("frameshift", df$VarClass), ]["VarClass"] <- "Frameshift"
+    }
+    if(sum(grepl("nonframeshift", df$VarClass) > 0)){
+      df[grep("nonframeshift", df$VarClass), ]["VarClass"] <- "InFrame"
+    }
+    if(sum(grepl("upstream", df$VarClass) > 0)){
+      df[grep("upstream", df$VarClass), ]["VarClass"] <- "Promoter"
+    }
+    if(sum(grepl("IntragenicDeletion", df$VarClass) > 0)){
+      df[grep("IntragenicDeletion", df$VarClass), ]["VarClass"] <- "Frameshift"
+    }
+
+    return(df)
+  }
+
+  if(convert){# change the variant types to more general names
+    df <- convert_varclass(df)
+    if(merge_scnas){
+      df2 <- convert_varclass(df2)
+
+    }
+
+  }else{
+    df[grep("splicing", df$VarClass), ]["VarClass"] <- "Mutation"
+    df[grep("stop", df$VarClass), ]["VarClass"] <- "Mutation"
+    df[grep("nonsynonymous", df$VarClass), ]["VarClass"] <- "Mutation"
+    df[grep("insertion", df$VarClass), ]["VarClass"] <- "Mutation"
+    df[grep("deletion", df$VarClass), ]["VarClass"] <- "Mutation"
+    df[grep("upstream", df$VarClass), ]["VarClass"] <- "Mutation"
+  }
+
+  #remove duplicates of gene events within the same sample.
+  #TO-DO do not remove if a gene has both a copy number alteration and a mutation
+
+  #df <- df %>% group_by(Gene, Mnumber) %>% unique()
+
+  if(merge_scnas){
+    alts <- acast(df, Gene ~ Mnumber)
+    alts2 <- acast(df2, Gene ~ Mnumber)
+    alterations <- paste.matrix(alts, alts2)
+    annotation.samples <- annotation$sample
+    missing.sample <- annotation[which(!annotation.samples%in%colnames(alterations)), ]
+    missing.matrix <- matrix(NA, nrow = nrow(alterations), ncol = nrow(missing.sample))
+    colnames(missing.matrix) <- missing.sample$sample
+    alterations <- cbind(alterations, missing.matrix)
+    alterations.c <- matrix(as.numeric(!is.na(alterations)), ncol = ncol(alterations))
+    colnames(alterations.c) <- colnames(alterations)
+    row.names(alterations.c) <- row.names(alterations)
+  }else{
+    alterations.c <- acast(df, Gene ~ Mnumber, fun.aggregate = length) # This is the 0 and 1 version of the matrix
+    alterations <- acast(df, Gene ~ Mnumber)
+  }
+
+
+
+  alteratons.c <- matrix(0, nrow = nrow(alterations))
+  for (i in 1:nrow(alterations)){
+    for(j in 1:ncol(alterations)){
+      altered <- alterations[i, j]
+
+      if(!is.na(altered)){ # there is an alteration
+        if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
+          alts <- unlist(str_split(altered, ",")) # split the alterations
+          alt1 <- alts[1] #assign them individually
+          alt2 <- alts[2]
+          # first alteration
+          alt <- alt1
+          alterations.c[i, j] <- alteration_score[[alt]]
+          alt <- alt2
+          alterations.c[i, j] <- alterations.c[i, j] + alteration_score[[alt]]
+
+        }else{
+          alt <- altered
+          alterations.c[i, j] <- alteration_score[[alt]]
+        }
+      }else{
+        alterations.c[i, j] <- 0
+      }
+    }
+  }
+
+  # Order the samples
+  alterations.c <- memoSort(alterations.c, geneName = geneName, annotations = annotation, annotation_order = annotation_order)
+
+  alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
+
+  ngenes <- nrow(alterations);
+  nsamples <- ncol(alterations);
+  coverage <- sum(colSums(alterations.c) > 0)
+
+  # if there any samples with no alterations, add them here:
+  if(!is.na(not_altered_sample_num) ){
+    mat <- matrix(data = rep(NA, ngenes*not_altered_sample_num), ncol = not_altered_sample_num, nrow = ngenes)
+    colnames(mat) <- not_altered_sample_names$Mnumber
+    alterations <- cbind(alterations, mat)
+  }
+
+
+  ngenes <- nrow(alterations)
+  nsamples <- ncol(alterations)
+  #cat("#ofGenes: ", ngenes, " # of Samples: ", nsamples)
+  ### OncoPrint
+  numOfOncos <- ngenes*nsamples
+  oncoCords.base <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
+  oncoCords <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
+  colnames(oncoCords.base) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+  colnames(oncoCords) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+
+  xpadding <- .13;
+  ypadding <- .1;
+  cnt <- 1;
+
+  cat("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
+
+  if (merge_scnas){
+    # if mutations and scna are merged, then crate a third matrix for copy number calls. this will be a second layer on top of grey background rects
+    oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
+    colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered");
+    for(i in 1:ngenes) {
+      for(j in 1:nsamples) {
+        #cat("i: ", i, " j: ", j, "\n")
+        altered <- alterations[i, j]
+        xleft <- j-1 + xpadding ;
+        ybottom <- ((ngenes-i+1) -1) + ypadding;
+        xright <- j - xpadding ;
+        ytop <- (ngenes-i+1) -ypadding;
+        oncoCords.base[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+        #browser()
+
+        if(!is.na(altered)){ # there is an alteration
+          if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
+            alts <- unlist(str_split(altered, ",")) # split the alterations
+            alt1 <- alts[1] #assign them individually
+            alt2 <- alts[2]
+            # first alteration
+            altered <- alt1
+            if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
+              ytop2 <- ytop-0.25
+              ybottom2 <- ybottom+0.25
+              oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"){
+              oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+            }
+            # second alteration
+            altered <- alt2
+            if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
+              ytop2 <- ytop-0.25
+              ybottom2 <- ybottom+0.25
+              oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"){
+              oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+            }
+
+
+          }else{ # alteration does not have a comma
+            if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
+              ytop2 <- ytop-0.25
+              ybottom2 <- ybottom+0.25
+              oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"){
+              oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+            }
+          }
+
+        }else{  # There is no alteration
+          oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+        }
+        cnt <- cnt+1;
+      }
+    }
+
+  }else{
+    for(i in 1:ngenes) {
+      for(j in 1:nsamples) {
+        altered <- alterations[i, j];
+        xleft <- j-1 + xpadding ;
+        ybottom <- ((ngenes-i+1) -1) + ypadding;
+        xright <- j - xpadding ;
+        ytop <- (ngenes-i+1) -ypadding;
+        oncoCords.base[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+        #browser()
+        if(!is.na(altered)){
+          if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame" || altered == "Amplification" || altered == "Deletion" || altered == "Present") {
+            ytop <- ytop-0.25
+            ybottom <- ybottom+0.25
+            oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+          }else{
+            oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+          }
+        }else{
+          oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+        }
+        cnt <- cnt+1;
+      }
+    }
+  }
+
+  labels = rownames(alterations)
+  if(!is.na(total_samples)){
+    labels=list()
+    for(i in (1:nrow(alterations.c))){
+      gene = row.names(alterations.c)[i]
+      cnt <- sum(ifelse(test = alterations.c[i,] ==0, yes = 0, no = 1))
+      prcnt <- cnt/total_samples*100
+      labels = c(labels, paste(gene, "  ",round(prcnt,1), "%", sep=""))
+    }
+  }
+
+
+  if (merge_scnas){ # at this point nsamples and ngenes reflect the merged matrix dims
+    cnt <- nsamples*ngenes
+    colors <- rep(NA, cnt)
+    colors.scna <- rep(NA, cnt)
+    colors[ which(oncoCords[, "altered"] == "Mutation") ] <- "#197338";
+    colors[ which(oncoCords[, "altered"] == "Missense") ] <- "#197338";
+    colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- "black";
+    colors[ which(oncoCords[, "altered"] == "Splicing") ] <- "#A05E35";
+    colors[ which(oncoCords[, "altered"] == "Frameshift") ] <- "#A05E35";
+    colors[ which(oncoCords[, "altered"] == "Promoter") ] <- "#2986E2";
+    colors[ which(oncoCords[, "altered"] == "InFrame") ] <- "#F26529";
+    colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "red";
+    colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "blue";
+    colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2";
+    colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey";
+
+  }else{
+    cnt <- nsamples*ngenes
+    colors <- rep(NA, cnt)
+    colors[ which(oncoCords[, "altered"] == "Mutation") ] <- "#197338";
+    colors[ which(oncoCords[, "altered"] == "Missense") ] <- "#197338";
+    colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- "black";
+    colors[ which(oncoCords[, "altered"] == "Splicing") ] <- "#A05E35";
+    colors[ which(oncoCords[, "altered"] == "Frameshift") ] <- "#A05E35";
+    colors[ which(oncoCords[, "altered"] == "Promoter") ] <- "#2986E2";
+    colors[ which(oncoCords[, "altered"] == "InFrame") ] <- "#F26529";
+    colors[ which(oncoCords[, "altered"] == "Amplification") ] <- "red";
+    colors[ which(oncoCords[, "altered"] == "Deletion") ] <- "blue";
+    colors[ which(oncoCords[, "altered"] == "Present") ] <- "black";
+  }
+  #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
+  #change the
+  def.par <- par(no.readonly = TRUE)
+
+  if(!is.na(annotation)){
+
+    split.screen(rbind(c(0.05, 0.95, 0.95, 0.99), c(0.05,0.95,0.15, 0.94), c(0.05, 0.95, 0.01, 0.15)))
+    screen(1)
+    par(mar=c(0,10,0, 1), mgp=c(3, 0.7, 0))
+    plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
+    counts <- data.frame(table(annotation$class))
+    xleft <- 0
+    axis.points <- list()
+    subtype.labels <-list()
+    for (i in 1:length(annotation_order)){
+      subtype.labels <- c(subtype.labels, annotation_order[i])
+      xright <- counts[which(counts$Var1 == annotation_order[i]), ]['Freq']
+      rect(xleft, 0, xleft + xright$Freq, 1, col = c48[i])
+      axis.points <- c(axis.points, (xleft + xleft+xright$Freq)/2)
+      xleft <- xleft + xright$Freq
+    }
+    #text(x=axis.points, y = 0.5, labels = subtype.labels)
+
+
+    screen(2)
+    par(mar=c(0.25,10,0,1), mgp=c(3, 0.7, 0))
+    plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F);
+    rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="lightgrey", border=NA);
+
+    if(merge_scnas){
+      rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
+    }
+    rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
+
+    axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
+    #axis(1, at=1:nsamples, labels=rep(1:nsample), las=2, lwd = 0)
+
+    #add legend
+    screen(3)
+    par(mar=c(0,0,0,0))
+    legend(x="topleft", c("Missense", "Nonsense", "Truncating", "In-Frame", "Promoter"), fill = c('#197338', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
+
+    legend(x="bottomleft", c("Amplification", "Deletion", "Present"), fill = c( 'red', 'blue', 'darkorchid2'), horiz=T, border = F, cex=0.9, bty = 'n', x.intersp = 0.5)
+    close.screen(all.screens = TRUE)
+
+  }else{
+    split.screen(rbind(c(0.05,0.95,0.15, 0.95), c(0.05, 0.95, 0.05, 0.15)))
+
+    #add oncoprints
+    screen(1)
+    par(mar=c(0.25,10,0.25,1), mgp=c(3, 0.7, 0))
+    plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F);
+    rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="lightgrey", border=NA);
+
+    if(merge_scnas){
+      rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
+    }
+    rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
+
+    axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
+    #axis(1, at=1:nsamples, labels=rep(1:nsample), las=2, lwd = 0)
+
+    #add legend
+    screen(2)
+    par(mar=c(0,0,0,0))
+    legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation"), fill = c('#197338', 'black',  '#A05E35'), horiz=T, border = F, cex=0.9, bty = 'n')
+    legend(x="bottomleft", c( "In-Frame mutation", "Promoter mutation", "Amplification", "Deletion"), fill = c('#F26529', '#2986E2',  'red', 'blue'), horiz=T, border = F, cex=0.9, bty = 'n')
+    close.screen(all.screens = TRUE)
+  }
+  par(def.par)
+  res <- list()
+  res$sortedMatrix <- alterations
+  res$sampleOrder <- colnames(alterations)
+  res$geneOrder <- rownames(alterations)
+
+
+
+  return(res)
+}
