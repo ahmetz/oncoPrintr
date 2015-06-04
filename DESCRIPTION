@@ -6,5 +6,9 @@ Date: 2015-05-25
 Author: Ahmet Zehir
 Maintainer: Ahmet Zehir <ahmetzehir@gmail.com>
 Description: Create oncoPrints with your own genomic data (Mutations, Copy number Alterations, Annotations)
-License: What license is it under?
+License: MIT
 LazyData: TRUE
+Imports:
+  magrittr,
+  dplyr,
+  reshape2

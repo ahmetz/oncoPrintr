@@ -18,6 +18,8 @@
 
 oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, alteration_score = list(Amplification = 3, Deletion = 3, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0)) {
   # This is the plotting function
+  library(reshape2)
+  library(dplyr)
 
 
 
