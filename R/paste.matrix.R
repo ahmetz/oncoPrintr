@@ -1,4 +1,6 @@
-#' paste.matrix takes two genomic evetn matrices as input and merges them. the matrices do not have the have the same dimensions. If a gene and a sample have two different alterations, they will be merged seperated with a comma
+#' paste.matrix 
+#'
+#' @description takes two genomic evetn matrices as input and merges them. the matrices do not have the have the same dimensions. If a gene and a sample have two different alterations, they will be merged seperated with a comma
 #'
 #' @param M1 matrix of genomic alterations
 #' @param M2 matrix of genomic alterations
