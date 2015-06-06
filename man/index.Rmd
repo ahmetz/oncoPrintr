@@ -5,6 +5,6 @@ date: "June 6, 2015"
 output: html_document
 ---
 
-**oncoPrintr**
-
+**oncoPrintr**  
+Here we will look at how to use oncoPrintr
 
