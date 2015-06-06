@@ -1,6 +1,6 @@
 #' oncoPrint
 #'
-#' @param df  this is the dataframe used to plot oncoprints. required colnames: Mnumber, Gene, VarClass
+#' @param df  this is the dataframe used to plot oncoprints. required colnames: Sample, Gene, VarClass
 #' @param sort Boelean indicating whether genes should be sorted or now (default: True)
 #' @param convert Boelean indicating whether varclasses should be converted to more standard names (default: True)
 #' @param total_samples Total number of samples. If not given, total row numbers of input will be used
@@ -10,16 +10,22 @@
 #' @param merge_scnas Bolean indicating whether to plot scnas and mutations together superimposed (default: False)
 #' @param second_df if merge_scnas is True, this is the second set of events to be merged
 #' @param alteration_score this list determines the relative importance of different genomic alterations. Amplification > Deletion > Mutations etc.
+#' @param printSamples Bolean indicating whether sample names should be printed under the oncoprint
 #'
 #' @return oncoPrint image
 #' @export
 #'
 #' @examples TODO
 
-oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, alteration_score = list(Amplification = 3, Deletion = 3, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0)) {
+oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, alteration_score = list(Amplification = 3, Deletion = 2, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0), printSamples = T) {
   # This is the plotting function
   library(reshape2)
   library(dplyr)
+  
+  colnames(df) <- c("Sample", "Gene", "VarClass")
+  if(!is.na(df2)){
+    colnames(df2) <- c("Sample", "Gene", "VarClass")
+  }
   
   remove_duplicates <- function(df){
     choose_alteration_type <- function(x){
@@ -52,7 +58,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
         }
       }
     }
-    df %>% group_by(Gene, Mnumber) %>% summarise(VarClass = choose_alteration_type(VarClass))
+    df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
   }
   
   
@@ -63,7 +69,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   if(!merge_scnas){
     if(nrow(df %>% filter(VarClass == "None")) > 0){
       not_altered_sample_num <- nrow(df %>% filter(VarClass == "None"))
-      not_altered_sample_names <- df %>% filter(VarClass == "None") %>% select(Mnumber)
+      not_altered_sample_names <- df %>% filter(VarClass == "None") %>% select(Sample)
       df <- df %>% filter(VarClass != "None")
     }
   }
@@ -74,31 +80,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   df <- remove_duplicates(df)
   if(merge_scnas){
     df2 <- remove_duplicates(df2)
-  }
-  convert_varclass <- function(df){
-    if (sum(grepl("splicing", df$VarClass) > 0)){
-      df[grep("splicing", df$VarClass), ]["VarClass"] <- "Splicing"
-    }
-    if(sum(grepl("stop", df$VarClass) > 0)){
-      df[grep("stop", df$VarClass), ]["VarClass"] <- "Nonsense"
-    }
-    if(sum(grepl("nonsynonymous", df$VarClass) > 0)){
-      df[grep("nonsynonymous", df$VarClass), ]["VarClass"] <- "Missense"
-    }
-    if(sum(grepl("frameshift", df$VarClass) > 0)){
-      df[grep("frameshift", df$VarClass), ]["VarClass"] <- "Frameshift"
-    }
-    if(sum(grepl("nonframeshift", df$VarClass) > 0)){
-      df[grep("nonframeshift", df$VarClass), ]["VarClass"] <- "InFrame"
-    }
-    if(sum(grepl("upstream", df$VarClass) > 0)){
-      df[grep("upstream", df$VarClass), ]["VarClass"] <- "Promoter"
-    }
-    if(sum(grepl("IntragenicDeletion", df$VarClass) > 0)){
-      df[grep("IntragenicDeletion", df$VarClass), ]["VarClass"] <- "Frameshift"
-    }
-    
-    return(df)
   }
   
   if(convert){# change the variant types to more general names
@@ -120,11 +101,12 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   #remove duplicates of gene events within the same sample.
   #TO-DO do not remove if a gene has both a copy number alteration and a mutation
   
-  #df <- df %>% group_by(Gene, Mnumber) %>% unique()
+  #df <- df %>% group_by(Gene, Sample) %>% unique()
   
-  if(merge_scnas){
-    alts <- acast(df, Gene ~ Mnumber)
-    alts2 <- acast(df2, Gene ~ Mnumber)
+  # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
+  if(merge_scnas && !is.na(annotation)){
+    alts <- acast(df, Gene ~ Sample)
+    alts2 <- acast(df2, Gene ~ Sample)
     alterations <- paste.matrix(alts, alts2)
     colnames(annotation) <- c("sample", "class")
     annotation.samples <- annotation$sample
@@ -137,14 +119,19 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     alterations.c <- matrix(as.numeric(!is.na(alterations)), ncol = ncol(alterations))
     colnames(alterations.c) <- colnames(alterations)
     row.names(alterations.c) <- row.names(alterations)
+  }else if(merge_scnas){
+    alts <- acast(df, Gene ~ Sample)
+    alts2 <- acast(df2, Gene ~ Sample)
+    alterations <- paste.matrix(alts, alts2)
+    alterations.c <- matrix(as.numeric(!is.na(alterations)), ncol = ncol(alterations))
+    colnames(alterations.c) <- colnames(alterations)
+    row.names(alterations.c) <- row.names(alterations)
   }else{
-    alterations.c <- acast(df, Gene ~ Mnumber, fun.aggregate = length) # This is the 0 and 1 version of the matrix
-    alterations <- acast(df, Gene ~ Mnumber)
+    alterations.c <- acast(df, Gene ~ Sample, fun.aggregate = length) # This is the 0 and 1 version of the matrix
+    alterations <- acast(df, Gene ~ Sample)
   }
-  
-  alteration_score <- list(Amplification = 4, Deletion = 3, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0)
-  
-  alteratons.c <- matrix(0, nrow = nrow(alterations))
+
+  #convert variant type matrix to numerical values
   for (i in 1:nrow(alterations)){
     for(j in 1:ncol(alterations)){
       altered <- alterations[i, j]
@@ -176,12 +163,12 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   
   ngenes <- nrow(alterations);
   nsamples <- ncol(alterations);
-  coverage <- sum(colSums(alterations.c) > 0)
+
   
   # if there any samples with no alterations, add them here: 
   if(!is.na(not_altered_sample_num) ){
     mat <- matrix(data = rep(NA, ngenes*not_altered_sample_num), ncol = not_altered_sample_num, nrow = ngenes)
-    colnames(mat) <- not_altered_sample_names$Mnumber
+    colnames(mat) <- not_altered_sample_names$Sample
     alterations <- cbind(alterations, mat)
   }
   
@@ -195,6 +182,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   oncoCords <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
   colnames(oncoCords.base) <- c("xleft", "ybottom", "xright", "ytop", "altered")
   colnames(oncoCords) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+  #crate a third matrix for copy number calls. this will be a second layer on top of grey background rects
   oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
   colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered");
   xpadding <- .13;
@@ -204,9 +192,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   cat("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
   
   if (merge_scnas){ 
-    # if mutations and scna are merged, then crate a third matrix for copy number calls. this will be a second layer on top of grey background rects
-    oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
-    colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered");
+
     for(i in 1:ngenes) {
       for(j in 1:nsamples) {
         #cat("i: ", i, " j: ", j, "\n")
@@ -320,12 +306,15 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
   #change the 
   def.par <- par(no.readonly = TRUE)
-  
+  leftmargin = 1/nsamples*500 
+  if(leftmargin > 20){leftmargin <- 20}
+  bottommargin = 1/ngenes*500
+  if(bottommargin > 5){bottommargin <- 1}
   if(!is.na(annotation)){
     
     split.screen(rbind(c(0.05, 0.95, 0.95, 0.99), c(0.05,0.95,0.15, 0.94), c(0.05, 0.95, 0.01, 0.15)))
     screen(1)
-    par(mar=c(0,10,0, 1), mgp=c(3, 0.7, 0))
+    par(mar=c(0,0,0, leftmargin), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
     counts <- data.frame(table(annotation$class))
     xleft <- 0
@@ -342,8 +331,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     
     
     screen(2)
-    par(mar=c(0.25,10,0,1), mgp=c(3, 0.7, 0))
-    plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F, );
+    par(mar=c(bottommargin,10,0,leftmargin), mgp=c(3, 0.7, 0))
+    plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="lightgrey", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
@@ -364,14 +353,15 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     
     #add oncoprints
     screen(1)
-    par(mar=c(2.5,10,0.25,1), mgp=c(3, 0.7, 0))
+    
+    par(mar=c(bottommargin,10,0.25, leftmargin), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F);
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="lightgrey", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
     
     axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
-    text((1:nsamples)-.5, par("usr")[3]+1,srt=45, adj = 1,  labels = colnames(alterations), xpd=T)
+    text((1:nsamples)-.5, par("usr")[3]+1,srt=45, adj = 1,  labels = colnames(alterations), xpd=T, cex = 0.6)
   
     #add legend
     screen(2)

@@ -7,11 +7,12 @@
 oncoPrint(df, sort = TRUE, convert = TRUE, total_samples = NA,
   geneName = NA, annotation = NA, annotation_order = NA,
   merge_scnas = F, df2 = NA, alteration_score = list(Amplification = 3,
-  Deletion = 3, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2,
-  Promoter = 2, Mutation = 1, Missense = 1, Present = 1, NotTested = 0))
+  Deletion = 2, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2,
+  Promoter = 2, Mutation = 1, Missense = 1, Present = 1, NotTested = 0, None =
+  0), printSamples = T)
 }
 \arguments{
-\item{df}{this is the dataframe used to plot oncoprints. required colnames: Mnumber, Gene, VarClass}
+\item{df}{this is the dataframe used to plot oncoprints. required colnames: Sample, Gene, VarClass}
 
 \item{sort}{Boelean indicating whether genes should be sorted or now (default: True)}
 
@@ -26,6 +27,8 @@ oncoPrint(df, sort = TRUE, convert = TRUE, total_samples = NA,
 \item{merge_scnas}{Bolean indicating whether to plot scnas and mutations together superimposed (default: False)}
 
 \item{alteration_score}{this list determines the relative importance of different genomic alterations. Amplification > Deletion > Mutations etc.}
+
+\item{printSamples}{Bolean indicating whether sample names should be printed under the oncoprint}
 
 \item{annotations}{If given, these will be used for pre-clustering}
 
