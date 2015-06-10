@@ -119,6 +119,19 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     alterations.c <- matrix(as.numeric(!is.na(alterations)), ncol = ncol(alterations))
     colnames(alterations.c) <- colnames(alterations)
     row.names(alterations.c) <- row.names(alterations)
+  }else if(!is.na(annotation)){
+    alterations <- acast(df, Gene ~ Sample)
+    colnames(annotation) <- c("sample", "class")
+    annotation.samples <- annotation$sample
+    
+    missing.sample <- annotation[which(!annotation.samples%in%colnames(alterations)), ]
+    missing.matrix <- matrix(NA, nrow = nrow(alterations), ncol = nrow(missing.sample))
+    colnames(missing.matrix) <- missing.sample$sample
+    
+    alterations <- cbind(alterations, missing.matrix)
+    alterations.c <- matrix(as.numeric(!is.na(alterations)), ncol = ncol(alterations))
+    colnames(alterations.c) <- colnames(alterations)
+    row.names(alterations.c) <- row.names(alterations)
   }else if(merge_scnas){
     alts <- acast(df, Gene ~ Sample)
     alts2 <- acast(df2, Gene ~ Sample)
@@ -314,7 +327,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     
     split.screen(rbind(c(0.05, 0.95, 0.95, 0.99), c(0.05,0.95,0.15, 0.94), c(0.05, 0.95, 0.01, 0.15)))
     screen(1)
-    par(mar=c(0,0,0, leftmargin), mgp=c(3, 0.7, 0))
+    par(mar=c(0,10,0, 0), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
     counts <- data.frame(table(annotation$class))
     xleft <- 0
@@ -331,7 +344,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     
     
     screen(2)
-    par(mar=c(bottommargin,10,0,leftmargin), mgp=c(3, 0.7, 0))
+    par(mar=c(0,10,0,0), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="lightgrey", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
@@ -354,7 +367,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     #add oncoprints
     screen(1)
     
-    par(mar=c(bottommargin,10,0.25, leftmargin), mgp=c(3, 0.7, 0))
+    par(mar=c(0,10,0.25, 9), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F);
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="lightgrey", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
