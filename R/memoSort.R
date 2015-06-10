@@ -38,19 +38,25 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
     colnames(annotations) <- c("sample", "class")
     classes <- unique(annotations$class)
     M2 <- matrix(nrow=nrow(M))
-
+    colnames(M2) <- "Drop"
+    rownames(M2) <- rownames(M)
+    M2 <- M2[geneOrder, , drop=F]
     for(class in annotation_order){
       samples <- annotations[which(annotations[, 2] == class), ][, 1]
-      sub_mat <- M[, which(colnames(M)%in%samples$sample)]
-      #print(sub_mat)
-      scores <- apply(sub_mat[geneOrder, ], 2, scoreCol)
-      sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
-      M2 <- cbind(M2, sub_mat[geneOrder, sampleOrder])
+      sub_mat <- M[, which(colnames(M)%in%samples$sample), drop=FALSE]
+
+      if (ncol(sub_mat) == 1){
+        M2 <- cbind(M2, sub_mat[geneOrder, ,drop=F])
+      }else{
+        scores <- apply(sub_mat[geneOrder, ], 2, scoreCol)
+        sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
+        M2 <- cbind(M2, sub_mat[geneOrder, sampleOrder])
+      }
       #cat(class, ", ", sampleOrder, "\n")
     }
     M <- M2[, 2:ncol(M2)]
+    #print(M)
     return(M)
-
   }else{
     scores <- apply(M[geneOrder, ], 2, scoreCol);
     sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
