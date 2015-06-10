@@ -17,7 +17,7 @@
 #'
 #' @examples TODO
 
-oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, alteration_score = list(Amplification = 3, Deletion = 2, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0), printSamples = T) {
+oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, colors = list(Amplification = "red", Deletion = "blue")alteration_score = list(Amplification = 3, Deletion = 2, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0), printSamples = T) {
   # This is the plotting function
   library(reshape2)
   library(dplyr)
@@ -301,20 +301,20 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   cnt <- nsamples*ngenes
   colors <- rep(NA, cnt)
   colors.scna <- rep(NA, cnt)
-  colors[ which(oncoCords[, "altered"] == "Mutation") ] <- "#197338";
-  colors[ which(oncoCords[, "altered"] == "Missense") ] <- "#197338";
-  colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- "black";
-  colors[ which(oncoCords[, "altered"] == "Splicing") ] <- "#A05E35";
-  colors[ which(oncoCords[, "altered"] == "Frameshift") ] <- "#A05E35";
-  colors[ which(oncoCords[, "altered"] == "Promoter") ] <- "#2986E2";
-  colors[ which(oncoCords[, "altered"] == "InFrame") ] <- "#F26529";
-  colors[ which(oncoCords[, "altered"] == "Amplification") ] <- "red";
-  colors[ which(oncoCords[, "altered"] == "Deletion") ] <- "blue";
-  colors[ which(oncoCords[, "altered"] == "Present") ] <- "black";
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "red";
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "blue";
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2";
-  colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey";
+  colors[ which(oncoCords[, "altered"] == "Mutation") ] <- "#197338"
+  colors[ which(oncoCords[, "altered"] == "Missense") ] <- "#197338"
+  colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- "black"
+  colors[ which(oncoCords[, "altered"] == "Splicing") ] <- "#A05E35"
+  colors[ which(oncoCords[, "altered"] == "Frameshift") ] <- "#A05E35"
+  colors[ which(oncoCords[, "altered"] == "Promoter") ] <- "#2986E2"
+  colors[ which(oncoCords[, "altered"] == "InFrame") ] <- "#F26529"
+  colors[ which(oncoCords[, "altered"] == "Amplification") ] <- colors["Amplification"]
+  colors[ which(oncoCords[, "altered"] == "Deletion") ] <- colors["Deletion"]
+  colors[ which(oncoCords[, "altered"] == "Present") ] <- "black"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "red"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "blue"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey"
   
   #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
   #change the 
