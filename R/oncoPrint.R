@@ -311,8 +311,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors[ which(oncoCords[, "altered"] == "Amplification") ] <- colors["Amplification"]
   colors[ which(oncoCords[, "altered"] == "Deletion") ] <- colors["Deletion"]
   colors[ which(oncoCords[, "altered"] == "Present") ] <- "black"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "red"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "blue"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- colors["Amplification"]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- colors["Deletion"]
   colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2"
   colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey"
   
