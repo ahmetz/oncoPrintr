@@ -53,6 +53,14 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           return(x[grep("Present", x[i]) ])
         }else if(grepl("NotTested", x[i])){
           return(x[grep("NotTested", x[i]) ])
+        }else if(grepl("del", x[i])){
+          return(x[grep("del", x[i]) ])
+        }else if(grepl("homo-del", x[i])){
+          return(x[grep("homo-del", x[i]) ])
+        }else if(grepl("CN-LOH", x[i])){
+          return(x[grep("CN-LOH", x[i]) ])
+        }else if(grepl("LOH", x[i])){
+          return(x[grep("LOH", x[i]) ])
         }else if(grepl("None", x[i])){
           return(x[grep("None", x[i]) ])
         }
@@ -247,7 +255,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
               ytop2 <- ytop-0.25
               ybottom2 <- ybottom+0.25
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"){
+            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested" || altered == "homo-del" || altered == "del" || altered == "CN-LOH" || altered == "LOH"){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
             }
           }
@@ -274,7 +282,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
             ytop2 <- ytop-0.25
             ybottom2 <- ybottom+0.25
             oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-          }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"){
+          }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested" || altered == "homo-del" || altered == "del" || altered == "CN-LOH" || altered == "LOH"){
             oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
           }else{
             oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
@@ -313,6 +321,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "red"
   colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2"
   colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "del") ] <- "red"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "LOH") ] <- "darkkhaki"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "homo-del") ] <- "coral"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "CN-LOH") ] <- "deepskyblue"
   
   #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
   #change the 
