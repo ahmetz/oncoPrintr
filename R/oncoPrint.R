@@ -236,7 +236,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
               ytop2 <- ytop-0.25
               ybottom2 <- ybottom+0.25
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"){
+            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
             }
             # second alteration
@@ -245,7 +245,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
               ytop2 <- ytop-0.25
               ybottom2 <- ybottom+0.25
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"){
+            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
             }
             
