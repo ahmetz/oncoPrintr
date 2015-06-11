@@ -17,7 +17,7 @@
 #'
 #' @examples TODO
 
-oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, colors = list(Amplification = "red", Deletion = "blue"), alteration_score = list(Amplification = 3, Deletion = 2, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, del = 3, homo-del = 2, LOH = 1.5, CN-LOH = 1), printSamples = T) {
+oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, colors = list(Amplification = "red", Deletion = "blue"), alteration_score = list(Amplification = 3, Deletion = 2, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T) {
   # This is the plotting function
   library(reshape2)
   library(dplyr)
@@ -255,7 +255,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
               ytop2 <- ytop-0.25
               ybottom2 <- ybottom+0.25
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested" || altered == "homo-del" || altered == "del" || altered == "CN-LOH" || altered == "LOH"){
+            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
             }
           }
@@ -282,7 +282,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
             ytop2 <- ytop-0.25
             ybottom2 <- ybottom+0.25
             oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-          }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested" || altered == "homo-del" || altered == "del" || altered == "CN-LOH" || altered == "LOH"){
+          }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
             oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
           }else{
             oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
@@ -323,8 +323,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey"
   colors.scna[ which(oncoCords.scna[, "altered"] == "del") ] <- "red"
   colors.scna[ which(oncoCords.scna[, "altered"] == "LOH") ] <- "darkkhaki"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "homo-del") ] <- "coral"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "CN-LOH") ] <- "deepskyblue"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "homodel") ] <- "coral"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "CNLOH") ] <- "deepskyblue"
   
   #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
   #change the 
