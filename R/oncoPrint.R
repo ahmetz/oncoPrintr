@@ -323,7 +323,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey"
   colors.scna[ which(oncoCords.scna[, "altered"] == "del") ] <- "red"
   colors.scna[ which(oncoCords.scna[, "altered"] == "LOH") ] <- "darkkhaki"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "homodel") ] <- "coral"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "homodel") ] <- "brown4"
   colors.scna[ which(oncoCords.scna[, "altered"] == "CNLOH") ] <- "deepskyblue"
   
   #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
