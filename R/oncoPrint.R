@@ -371,7 +371,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     par(mar=c(0,0,0,0))
     legend(x="topleft", c("Missense", "Nonsense", "Truncating", "In-Frame", "Promoter"), fill = c('#197338', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
     
-    legend(x="bottomleft", c("Amplification", "Deletion", "Present"), fill = c( 'red', 'blue', 'darkorchid2'), horiz=T, border = F, cex=0.9, bty = 'n', x.intersp = 0.5)
+    legend(x="bottomleft", c("Amplification", "Deletion", "LOH", "Present"), fill = c( 'red', 'blue', 'darkkhaki', 'darkorchid2'), horiz=T, border = F, cex=0.9, bty = 'n', x.intersp = 0.5)
     close.screen(all.screens = TRUE)
     
   }else{
