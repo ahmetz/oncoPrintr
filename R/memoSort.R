@@ -15,10 +15,10 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
     score <- 0;
     for(i in 1:length(x)) {
       if(x[i]) {
-        score <- score + 2^(20+length(x)-i)
+        score <- score + 2^(length(x)-i)
       }
     }
-    score <- score + sum(x*(length(x):1))
+    #score <- score + sum(x*(length(x):1))
     return(score);
   }
 
