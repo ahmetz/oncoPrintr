@@ -386,9 +386,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
     
-    axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
-    text((1:nsamples)-.5, par("usr")[3]+1,srt=45, adj = 1,  labels = colnames(alterations), xpd=T, cex = 0.6)
-  
+    if(printSamples){
+      axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
+      text((1:nsamples)-.5, par("usr")[3]+1,srt=45, adj = 1,  labels = colnames(alterations), xpd=T, cex = 0.6)
+    }
     #add legend
     screen(2)
     par(mar=c(0,0,0,0))
