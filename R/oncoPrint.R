@@ -406,7 +406,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   res$sampleOrder <- colnames(alterations)
   res$geneOrder <- rownames(alterations)
   res$gene_prcnt <- gene_prcnt
-  
+  res$alterations.value <- alterations.c
   res
 }
 
