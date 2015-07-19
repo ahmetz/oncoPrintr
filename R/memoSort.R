@@ -25,7 +25,6 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
   # try giving the gene order manually. based on number of samples that has that event...
   if(!is.na(geneName)) {
     a <- sort(rowSums(M), decreasing=TRUE, index.return=TRUE)
-    print(a)
     geneOrder <- a[[2]][-which(names(a$x) %in% geneName) ]
     for (gene in rev(geneName)){
       geneOrder <- c(which(rownames(M) == gene), geneOrder)
