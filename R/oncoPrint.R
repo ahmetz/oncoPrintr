@@ -207,7 +207,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
   colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered");
   xpadding <- .13;
-  ypadding <- .1;
+  ypadding <- .01;
   cnt <- 1;
   
   cat("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
