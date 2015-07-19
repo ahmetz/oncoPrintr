@@ -296,12 +296,14 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   }
   
   labels = rownames(alterations)
+  gene_prcnt <- list()
   if(!is.na(total_samples)){
     labels=list()
     for(i in (1:nrow(alterations.c))){
       gene = row.names(alterations.c)[i]
       cnt <- sum(ifelse(test = alterations.c[i,] ==0, yes = 0, no = 1))
       prcnt <- cnt/total_samples*100
+      gene_prcnt[gene] <- prcnt
       labels = c(labels, paste(gene, "  ",round(prcnt,1), "%", sep=""))
     }
   }
@@ -386,8 +388,9 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
     
+    axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
+    #printing samples or not
     if(printSamples){
-      axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
       text((1:nsamples)-.5, par("usr")[3]+1,srt=45, adj = 1,  labels = colnames(alterations), xpd=T, cex = 0.6)
     }
     #add legend
@@ -402,6 +405,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   res$sortedMatrix <- alterations
   res$sampleOrder <- colnames(alterations)
   res$geneOrder <- rownames(alterations)
+  res$gene_prcnt <- gene_prcnt
   
   res
 }
