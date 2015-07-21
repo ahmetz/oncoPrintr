@@ -33,6 +33,7 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
   }else{
     geneOrder <- sort(rowSums(M), decreasing=TRUE, index.return=TRUE)$ix
   }
+  
   if(!is.na(annotations)){
     colnames(annotations) <- c("sample", "class")
     classes <- unique(annotations$class)
@@ -50,8 +51,10 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
         
         #scores <- apply(sub_mat[geneOrder, ], 2, scoreCol)
         #sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
-        sub_mat <- t(apply(t(sub_mat), 2, sort, decreasing=T))
-        
+        sub_mat.t <- t(sub_mat)
+        sub_mat.t <-  sub_mat.t[do.call(order, as.data.frame(sub_mat.t)), ]
+        sub_mat <- t(sub_mat.t)
+        sub_mat <- sub_mat[, ncol(sub_mat):1]
         M2 <- cbind(M2, sub_mat[geneOrder, ])
       }
       #cat(class, ", ", sampleOrder, "\n")
@@ -63,7 +66,10 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
     #scores <- apply(M[geneOrder, ], 2, scoreCol);
     #sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
   }
-  M <- t(apply(t(M), 2, sort, decreasing=T))
+  M.t <- t(M)
+  M.t <-  M.t[do.call(order, as.data.frame(M.t)), ]
+  M <- t(M.t)
+  M <- M[, ncol(M):1]
   return(M[geneOrder, ]);
   
 }
