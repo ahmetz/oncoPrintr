@@ -10,18 +10,18 @@
 #'
 #' @examples TODO
 memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) {
-
-  scoreCol <- function(x) {
-    score <- 0;
-    for(i in 1:length(x)) {
-      if(x[i]) {
-        score <- score + 5000^(length(x)-i)
-      }
-    }
-    #score <- score + sum(x*(length(x):1))
-    return(score);
-  }
-
+  
+#   scoreCol <- function(x) {
+#     score <- 0;
+#     for(i in 1:length(x)) {
+#       if(x[i]) {
+#         score <- score + 5000^(length(x)-i)
+#       }
+#     }
+#     #score <- score + sum(x*(length(x):1))
+#     return(score);
+#   }
+#   
   # try giving the gene order manually. based on number of samples that has that event...
   if(!is.na(geneName)) {
     a <- sort(rowSums(M), decreasing=TRUE, index.return=TRUE)
@@ -43,13 +43,16 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
     for(class in annotation_order){
       samples <- annotations[which(annotations[, 2] == class), ][, 1]
       sub_mat <- M[, which(colnames(M)%in%samples$sample), drop=FALSE]
-
+      
       if (ncol(sub_mat) == 1){
         M2 <- cbind(M2, sub_mat[geneOrder, ,drop=F])
       }else{
-        scores <- apply(sub_mat[geneOrder, ], 2, scoreCol)
-        sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
-        M2 <- cbind(M2, sub_mat[geneOrder, sampleOrder])
+        
+        #scores <- apply(sub_mat[geneOrder, ], 2, scoreCol)
+        #sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
+        sub_mat <- t(apply(t(sub_mat), 2, sort, decreasing=T))
+        
+        M2 <- cbind(M2, sub_mat[geneOrder, ])
       }
       #cat(class, ", ", sampleOrder, "\n")
     }
@@ -57,10 +60,10 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
     #print(M)
     return(M)
   }else{
-    scores <- apply(M[geneOrder, ], 2, scoreCol);
-    sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
+    #scores <- apply(M[geneOrder, ], 2, scoreCol);
+    #sampleOrder <- sort(scores, decreasing=TRUE, index.return=TRUE)$ix
   }
-
-  return(M[geneOrder, sampleOrder]);
-
+  M <- t(apply(t(M), 2, sort, decreasing=T))
+  return(M[geneOrder, ]);
+  
 }
