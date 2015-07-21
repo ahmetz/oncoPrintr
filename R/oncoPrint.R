@@ -17,7 +17,7 @@
 #'
 #' @examples TODO
 
-oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, colors = list(Amplification = "red", Deletion = "blue"), alteration_score = list(Amplification = 5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T, xpadding = 0.1) {
+oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, colors = list(Amplification = "red", Deletion = "blue"), alteration_score = list(Amplification = 5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T, xpadding = 0.1, ypadding = 0.1) {
   # This is the plotting function
   library(reshape2)
   library(dplyr)
@@ -210,7 +210,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
   colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered");
   xpadding <- xpadding;
-  ypadding <- .1;
+  ypadding <- ypadding;
   cnt <- 1;
   
   cat("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
