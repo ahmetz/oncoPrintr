@@ -69,7 +69,7 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
   M.t <- t(M)
   M.t <-  M.t[do.call(order, as.data.frame(M.t)), ]
   M <- t(M.t)
-  M <- M[, ncol(M):1]
+  #M <- M[, ncol(M):1]
   return(M[geneOrder, ]);
   
 }
