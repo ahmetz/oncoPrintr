@@ -23,16 +23,16 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
 #   }
 #   
   # try giving the gene order manually. based on number of samples that has that event...
-  if(!is.na(geneName)) {
-    a <- sort(rowSums(M), decreasing=TRUE, index.return=TRUE)
-    geneOrder <- a[[2]][-which(names(a$x) %in% geneName) ]
-    for (gene in rev(geneName)){
-      geneOrder <- c(which(rownames(M) == gene), geneOrder)
-    }
-    #geneOrder <- c(which(rownames(M)%in%geneName), geneOrder)
-  }else{
-    geneOrder <- sort(rowSums(M), decreasing=TRUE, index.return=TRUE)$ix
-  }
+  #if(!is.na(geneName)) {
+  #  a <- sort(rowSums(M), decreasing=TRUE, index.return=TRUE)
+  #  geneOrder <- a[[2]][-which(names(a$x) %in% geneName) ]
+  #  for (gene in rev(geneName)){
+  #    geneOrder <- c(which(rownames(M) == gene), geneOrder)
+  #  }
+  #  #geneOrder <- c(which(rownames(M)%in%geneName), geneOrder)
+  #}else{
+  #  geneOrder <- sort(rowSums(M), decreasing=TRUE, index.return=TRUE)$ix
+  #}
   
   if(!is.na(annotations)){
     colnames(annotations) <- c("sample", "class")
@@ -70,6 +70,6 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
   M.t <-  M.t[do.call(order, as.data.frame(M.t)), ]
   M <- t(M.t)
   #M <- M[, ncol(M):1]
-  return(M[geneOrder, ]);
+  return(M[geneName, ]);
   
 }
