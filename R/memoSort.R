@@ -10,7 +10,7 @@
 #'
 #' @examples TODO
 memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) {
-  
+  M <- M[geneName, ]
 #   scoreCol <- function(x) {
 #     score <- 0;
 #     for(i in 1:length(x)) {
@@ -70,6 +70,6 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
   M.t <-  M.t[do.call(order, as.data.frame(M.t)), ]
   M <- t(M.t)
   #M <- M[, ncol(M):1]
-  return(M[geneName, ]);
+  return(M);
   
 }
