@@ -209,7 +209,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   #crate a third matrix for copy number calls. this will be a second layer on top of grey background rects
   oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
   colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered");
-  xpadding <- 0;
+  xpadding <- 0.03;
   ypadding <- .1;
   cnt <- 1;
   
