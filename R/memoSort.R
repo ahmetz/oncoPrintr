@@ -55,7 +55,7 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
         sub_mat.t <-  sub_mat.t[do.call(order, as.data.frame(sub_mat.t)), ]
         sub_mat <- t(sub_mat.t)
         sub_mat <- sub_mat[, ncol(sub_mat):1]
-        M2 <- cbind(M2, sub_mat[geneOrder, ])
+        M2 <- cbind(M2, sub_mat)
       }
       #cat(class, ", ", sampleOrder, "\n")
     }
@@ -69,7 +69,7 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
   M.t <- t(M)
   M.t <-  M.t[do.call(order, as.data.frame(M.t)), ]
   M <- t(M.t)
-  #M <- M[, ncol(M):1]
+  M <- M[, ncol(M):1]
   return(M);
   
 }
