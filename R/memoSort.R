@@ -46,7 +46,7 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
       sub_mat <- M[, which(colnames(M)%in%samples$sample), drop=FALSE]
       
       if (ncol(sub_mat) == 1){
-        M2 <- cbind(M2, sub_mat[geneOrder, ,drop=F])
+        M2 <- cbind(M2, sub_mat[, 1,drop=F])
       }else{
         
         #scores <- apply(sub_mat[geneOrder, ], 2, scoreCol)
