@@ -9,8 +9,7 @@
 #' @export
 #'
 #' @examples TODO
-memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) {
-  M <- M[geneName, ]
+memoSort <- function(M, annotations = NA, annotation_order = NA) {
 
   if(!is.na(annotations)){
     colnames(annotations) <- c("sample", "class")
@@ -34,10 +33,9 @@ memoSort <- function(M, geneName = NA, annotations = NA, annotation_order = NA) 
         sub_mat <- sub_mat[, ncol(sub_mat):1]
         M2 <- cbind(M2, sub_mat)
       }
-      #cat(class, ", ", sampleOrder, "\n")
     }
     M <- M2[, 2:ncol(M2)]
-    #print(M)
+
     return(M)
   }else{
   M.t <- t(M)
