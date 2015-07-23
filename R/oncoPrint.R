@@ -182,11 +182,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   if(is.na(geneName)){
     geneName <- row.names(alterations)
   }
-  alterations.c <- memoSort(alterations.c, annotations = annotation, annotation_order = annotation_order)
+  alterations.c <- memoSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
   alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
-  
-  alterations.c <- alterations.c[ geneName, ]
-  alterations <- alterations[geneName, ]
   
   ngenes <- nrow(alterations);
   nsamples <- ncol(alterations);
