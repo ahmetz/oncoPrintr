@@ -9,8 +9,8 @@
 #' @export
 #'
 #' @examples TODO
-memoSort <- function(M, annotations = NA, annotation_order = NA) {
-
+memoSort <- function(M, geneOrder = geneOrder, annotations = NA, annotation_order = NA) {
+  M <- M[geneOrder, ]
   if(!is.na(annotations)){
     colnames(annotations) <- c("sample", "class")
     classes <- unique(annotations$class)
