@@ -8,7 +8,7 @@
 #' @return matrix with samples and genes sorted
 #' @export
 #'
-#' @examples TODO
+#' @examples TODO2
 memoSort <- function(M, geneOrder = geneOrder, annotations = NA, annotation_order = NA) {
   M <- M[geneOrder, ]
   if(!is.na(annotations)){
