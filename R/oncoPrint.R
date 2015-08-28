@@ -402,7 +402,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     screen(2)
     par(mar=c(0,0,0,0))
     legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation"), fill = c('#26A818', 'black',  '#A05E35'), horiz=T, border = F, cex=0.9, bty = 'n')
-    legend(x="bottomleft", c( "In-Frame mutation", "Promoter mutation", "Amplification", "Deletion"), fill = c('#F26529', '#2986E2',  '#EA2E49', '#174D9D'), horiz=T, border = F, cex=0.9, bty = 'n')
+    legend(x="bottomleft", c( "In-Frame mutation", "Promoter mutation", "Amplification", "Deletion", "Present"), fill = c('#F26529', '#2986E2',  '#EA2E49', '#174D9D', "darkorchid2"), horiz=T, border = F, cex=0.9, bty = 'n')
     close.screen(all.screens = TRUE)
   }
   par(def.par) 
