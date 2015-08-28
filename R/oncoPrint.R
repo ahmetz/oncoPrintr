@@ -127,6 +127,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     alterations.c <- matrix(as.numeric(!is.na(alterations)), ncol = ncol(alterations))
     colnames(alterations.c) <- colnames(alterations)
     row.names(alterations.c) <- row.names(alterations)
+    
   }else if(!is.na(annotation)){
     alterations <- acast(df, Gene ~ Sample)
     colnames(annotation) <- c("sample", "class")
@@ -302,10 +303,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   gene_prcnt <- list()
   if(!is.na(total_samples)){
     labels=list()
-    for(i in (1:nrow(alterations.c))){
-      gene = row.names(alterations.c)[i]
-      cnt <- sum(ifelse(test = alterations.c[i,] ==0, yes = 0, no = 1))
-      prcnt <- cnt/total_samples*100
+    for(i in (1:nrow(alterations))){
+      gene = row.names(alterations)[i]
+      cnt <- sum(ifelse(test = is.na(alterations[i,]), yes = 0, no = ifelse(test =grepl(",", alterations[i,]), yes = 2, no = 1)))
+      prcnt <- cnt/length(alterations.c[i,])*100
       gene_prcnt[gene] <- prcnt
       labels = c(labels, paste(gene, "  ",round(prcnt,1), "%", sep=""))
     }
@@ -314,8 +315,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   cnt <- nsamples*ngenes
   colors <- rep(NA, cnt)
   colors.scna <- rep(NA, cnt)
-  colors[ which(oncoCords[, "altered"] == "Mutation") ] <- "#197338"
-  colors[ which(oncoCords[, "altered"] == "Missense") ] <- "#197338"
+  colors[ which(oncoCords[, "altered"] == "Mutation") ] <- "#26A818"
+  colors[ which(oncoCords[, "altered"] == "Missense") ] <- "#26A818"
   colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- "black"
   colors[ which(oncoCords[, "altered"] == "Splicing") ] <- "#A05E35"
   colors[ which(oncoCords[, "altered"] == "Frameshift") ] <- "#A05E35"
@@ -324,14 +325,14 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors[ which(oncoCords[, "altered"] == "Present") ] <- "black"
 
   colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "NotPresent") ] <- "lightgrey"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "NotPresent") ] <- "#DCD9D3"
   colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey"
   colors.scna[ which(oncoCords.scna[, "altered"] == "del") ] <- "blue"
   colors.scna[ which(oncoCords.scna[, "altered"] == "LOH") ] <- "darkkhaki"
   colors.scna[ which(oncoCords.scna[, "altered"] == "homodel") ] <- "brown4"
   colors.scna[ which(oncoCords.scna[, "altered"] == "CNLOH") ] <- "deepskyblue"
-    colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "red"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "blue"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "#EA2E49"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "#174D9D"
   
   c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
   
@@ -365,7 +366,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     screen(2)
     par(mar=c(0,10,0,0), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
-    rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="lightgrey", border=NA);
+    rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
     
@@ -375,9 +376,9 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     #add legend
     screen(3)
     par(mar=c(0,0,0,0))
-    legend(x="topleft", c("Missense", "Nonsense", "Truncating", "In-Frame", "Promoter"), fill = c('#197338', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
+    legend(x="topleft", c("Missense", "Nonsense", "Truncating", "In-Frame", "Promoter"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
     
-    legend(x="bottomleft", c("Amplification", "Deletion", "LOH", "Present"), fill = c( 'red', 'blue', 'darkkhaki', 'darkorchid2'), horiz=T, border = F, cex=0.9, bty = 'n', x.intersp = 0.5)
+    legend(x="bottomleft", c("Amplification", "Deletion", "LOH", "Present"), fill = c( '#EA2E49', '#174D9D', 'darkkhaki', 'darkorchid2'), horiz=T, border = F, cex=0.9, bty = 'n', x.intersp = 0.5)
     close.screen(all.screens = TRUE)
     
   }else{
@@ -388,7 +389,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     
     par(mar=c(1,10,0.25, 9), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F);
-    rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="lightgrey", border=NA);
+    rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
     
@@ -400,8 +401,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     #add legend
     screen(2)
     par(mar=c(0,0,0,0))
-    legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation"), fill = c('#197338', 'black',  '#A05E35'), horiz=T, border = F, cex=0.9, bty = 'n')
-    legend(x="bottomleft", c( "In-Frame mutation", "Promoter mutation", "Amplification", "Deletion"), fill = c('#F26529', '#2986E2',  'red', 'blue'), horiz=T, border = F, cex=0.9, bty = 'n')
+    legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation"), fill = c('#26A818', 'black',  '#A05E35'), horiz=T, border = F, cex=0.9, bty = 'n')
+    legend(x="bottomleft", c( "In-Frame mutation", "Promoter mutation", "Amplification", "Deletion"), fill = c('#F26529', '#2986E2',  '#EA2E49', '#174D9D'), horiz=T, border = F, cex=0.9, bty = 'n')
     close.screen(all.screens = TRUE)
   }
   par(def.par) 

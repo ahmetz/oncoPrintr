@@ -4,16 +4,17 @@
 \alias{memoSort}
 \title{memoSort}
 \usage{
-memoSort(M, geneName = NA, annotations = NA, annotation_order = NA)
+memoSort(M, geneOrder = geneOrder, annotations = NA,
+  annotation_order = NA)
 }
 \arguments{
 \item{M}{matrix of alterations.}
 
-\item{geneName}{If certain genes needs to be on the top, this value should provide them in a list}
-
 \item{annotations}{this holds the per sample annotation values. the matrix will be split into n sub matrices and sorted then merged at the end.}
 
 \item{annotation_order}{specify the order of the annotation. If not present, R will sort it alphabetically}
+
+\item{geneName}{If certain genes needs to be on the top, this value should provide them in a list}
 }
 \value{
 matrix with samples and genes sorted
@@ -22,6 +23,6 @@ matrix with samples and genes sorted
 memoSort
 }
 \examples{
-TODO
+TODO2
 }
 

@@ -10,6 +10,7 @@
 #'
 #' @examples TODO2
 memoSort <- function(M, geneOrder = geneOrder, annotations = NA, annotation_order = NA) {
+  print(geneOrder)
   M <- M[geneOrder, ]
   if(!is.na(annotations)){
     colnames(annotations) <- c("sample", "class")
