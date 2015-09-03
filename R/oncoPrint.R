@@ -205,6 +205,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
       colnames(mat) <- paste(rep("MockSample", diff), "_", 1:diff, sep="")
       alterations <- cbind(alterations, mat)
+      alterations.c <- cbind(alterations.c, mat)
     }
   }
   
