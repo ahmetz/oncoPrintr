@@ -197,6 +197,16 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     alterations <- cbind(alterations, mat)
   }
   
+  # check the total_samples variable. If there is a value given, make sure the # of samples match that
+  nsamples <- ncol(alterations)
+  if(!is.na(total_samples)){
+    if(total_samples != nsamples){
+      diff <- total_samples - nsamples
+      mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
+      colnames(mat) <- paste(rep("MockSample", diff), "_", 1:diff, sep="")
+      alterations <- cbind(alterations, mat)
+    }
+  }
   
   ngenes <- nrow(alterations)
   nsamples <- ncol(alterations)
