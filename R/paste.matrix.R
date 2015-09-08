@@ -28,7 +28,7 @@ paste.matrix <- function(M1, M2){
       x = NA
       y = NA
       if(row %in% rownames1 && col %in% colnames1){
-        cat("row: ", row, ", col: ", col, "\n")
+        #cat("row: ", row, ", col: ", col, "\n")
         x = M1[row, col]
         
       }
