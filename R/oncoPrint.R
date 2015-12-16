@@ -21,8 +21,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   # This is the plotting function
   library(reshape2)
   library(dplyr)
-  a <- colnames(df)
-  cat(a)
+
   colnames(df) <- c("Sample", "Gene", "VarClass")
   if(!is.na(df2)){
     colnames(df2) <- c("Sample", "Gene", "VarClass")
@@ -84,7 +83,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     }
   }
   
-  
+  cat("line86\n")
   #remove duplicates of gene events within the same sample.
   #TO-DO do not remove if a gene has both a copy number alteration and a mutation
   df <- remove_duplicates(df)
@@ -151,6 +150,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     colnames(alterations.c) <- colnames(alterations)
     row.names(alterations.c) <- row.names(alterations)
   }else{
+  cat("line153\n")
     alterations.c <- acast(df, Gene ~ Sample, fun.aggregate = length) # This is the 0 and 1 version of the matrix
     alterations <- acast(df, Gene ~ Sample)
   }
