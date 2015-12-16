@@ -28,6 +28,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   }
   
   remove_duplicates <- function(df){
+    cat("Filtering duplicates\n")
     choose_alteration_type <- function(x){
       for (i in 1:length(x)){
         #cat(x[i, ]$Gene, ":", x[i, ], ":", i)
