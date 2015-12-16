@@ -21,7 +21,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   # This is the plotting function
   library(reshape2)
   library(dplyr)
-  cat(df, "\n")
+  a <- colnames(df)
+  cat(a)
   colnames(df) <- c("Sample", "Gene", "VarClass")
   if(!is.na(df2)){
     colnames(df2) <- c("Sample", "Gene", "VarClass")
