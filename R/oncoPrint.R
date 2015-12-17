@@ -412,7 +412,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
     #printing samples or not
     if(printSamples){
-      text((1:nsamples)-.5, par("usr")[3]+1,srt=45, adj = 1,  labels = colnames(alterations), xpd=T, cex = 0.6)
+      text((1:nsamples)-.5,srt=45, adj = 1,  labels = colnames(alterations), xpd=T, cex = 0.6)
     }
     #add legend
     screen(2)
