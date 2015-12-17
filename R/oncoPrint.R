@@ -28,47 +28,48 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   }
   
   remove_duplicates <- function(df){
-    cat("Filtering duplicates\n")
-    choose_alteration_type <- function(x){
-      for (i in 1:length(x)){
-        cat(x[i, ]$Gene, ":", x[i, ], ":", i)
-        if(grepl("stopgain", x[i])){
-          return(x[grep("stopgain", x[i])])
-        }else if(grepl("insertion", x[i])){
-          return(x[grep("insertion", x[i])])
-        }else if(grepl("deletion", x[i])){
-          return(x[grep("deletion", x[i]) ])
-        }else if(grepl("splicing", x[i])){
-          return(x[grep("splicing", x[i]) ])
-        }else if(grepl("nonsynonymous", x[i])){
-          return(x[grep("nonsynonymous", x[i]) ])
-        }else if(grepl("upstream", x[i])){
-          return(x[grep("upstream", x[i]) ])
-        }else if(grepl("Amplification", x[i])){
-          return(x[grep("Amplification", x[i]) ])
-        }else if(grepl("IntragenicDeletion", x[i])){
-          return(x[grep("IntragenicDeletion", x[i]) ])
-        }else if(grepl("Deletion", x[i])){
-          return(x[grep("Deletion", x[i]) ])
-        }else if(grepl("Present", x[i])){
-          return(x[grep("Present", x[i]) ])
-        }else if(grepl("NotTested", x[i])){
-          return(x[grep("NotTested", x[i]) ])
-        }else if(grepl("del", x[i])){
-          return(x[grep("del", x[i]) ])
-        }else if(grepl("homo-del", x[i])){
-          return(x[grep("homo-del", x[i]) ])
-        }else if(grepl("CN-LOH", x[i])){
-          return(x[grep("CN-LOH", x[i]) ])
-        }else if(grepl("LOH", x[i])){
-          return(x[grep("LOH", x[i]) ])
-        }else if(grepl("None", x[i])){
-          return(x[grep("None", x[i]) ])
-        }
+  cat("Filtering duplicates\n")
+  choose_alteration_type <- function(x){
+    for (i in 1:length(x)){
+      #cat(length(x), "\n")
+      #cat(x[i, ]$Gene, ":", x[i, ], ":", i)
+      if(grepl("stopgain", x[i])){
+        return(x[grep("stopgain", x[i])])
+      }else if(grepl("insertion", x[i])){
+        return(x[grep("insertion", x[i])])
+      }else if(grepl("deletion", x[i])){
+        return(x[grep("deletion", x[i]) ])
+      }else if(grepl("splicing", x[i])){
+        return(x[grep("splicing", x[i]) ])
+      }else if(grepl("nonsynonymous", x[i])){
+        return(x[grep("nonsynonymous", x[i]) ])
+      }else if(grepl("upstream", x[i])){
+        return(x[grep("upstream", x[i]) ])
+      }else if(grepl("Amplification", x[i])){
+        return(x[grep("Amplification", x[i]) ])
+      }else if(grepl("IntragenicDeletion", x[i])){
+        return(x[grep("IntragenicDeletion", x[i]) ])
+      }else if(grepl("Deletion", x[i])){
+        return(x[grep("Deletion", x[i]) ])
+      }else if(grepl("Present", x[i])){
+        return(x[grep("Present", x[i]) ])
+      }else if(grepl("NotTested", x[i])){
+        return(x[grep("NotTested", x[i]) ])
+      }else if(grepl("del", x[i])){
+        return(x[grep("del", x[i]) ])
+      }else if(grepl("homo-del", x[i])){
+        return(x[grep("homo-del", x[i]) ])
+      }else if(grepl("CN-LOH", x[i])){
+        return(x[grep("CN-LOH", x[i]) ])
+      }else if(grepl("LOH", x[i])){
+        return(x[grep("LOH", x[i]) ])
+      }else if(grepl("None", x[i])){
+        return(x[grep("None", x[i]) ])
       }
     }
-    df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
   }
+  df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
+}
   
   
   # check if there are any samples with no alterations. If so, remove them to add later on. 
