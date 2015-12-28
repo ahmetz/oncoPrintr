@@ -17,7 +17,7 @@
 #'
 #' @examples TODO
 
-oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, colors = list(Amplification = "red", Deletion = "blue"), alteration_score = list(Amplification = 5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T, xpadding = 0.1, ypadding = 0.1) {
+oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, colors = list(Amplification = "red", Deletion = "blue"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T, xpadding = 0.1, ypadding = 0.1) {
   # This is the plotting function
   library(reshape2)
   library(dplyr)
@@ -35,6 +35,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       #cat(x[i, ]$Gene, ":", x[i, ], ":", i)
       if(grepl("stopgain", x[i])){
         return(x[grep("stopgain", x[i])])
+      }if(grepl("Fusion", x[i])){
+        return(x[grep("Fusion", x[i])])
       }else if(grepl("insertion", x[i])){
         return(x[grep("insertion", x[i])])
       }else if(grepl("deletion", x[i])){
@@ -83,8 +85,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       df <- df %>% filter(VarClass != "None")
     }
   }
-  
-  cat("line86\n")
+
   #remove duplicates of gene events within the same sample.
   #TO-DO do not remove if a gene has both a copy number alteration and a mutation
   df <- remove_duplicates(df)
@@ -107,11 +108,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     df[grep("deletion", df$VarClass), ]["VarClass"] <- "Mutation"
     df[grep("upstream", df$VarClass), ]["VarClass"] <- "Mutation"
   }
-  
-  #remove duplicates of gene events within the same sample.
-  #TO-DO do not remove if a gene has both a copy number alteration and a mutation
-  
-  #df <- df %>% group_by(Gene, Sample) %>% unique()
+
   
   # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
   if(merge_scnas && !is.na(annotation)){
@@ -151,7 +148,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     colnames(alterations.c) <- colnames(alterations)
     row.names(alterations.c) <- row.names(alterations)
   }else{
-  cat("line153\n")
     alterations.c <- acast(df, Gene ~ Sample, fun.aggregate = length) # This is the 0 and 1 version of the matrix
     alterations <- acast(df, Gene ~ Sample)
   }
@@ -224,6 +220,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   #crate a third matrix for copy number calls. this will be a second layer on top of grey background rects
   oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
   colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered");
+  oncoCords.fusion <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
+  colnames(oncoCords.fusion) <- c("xleft", "ybottom", "xright", "ytop", "altered");
   xpadding <- xpadding;
   ypadding <- ypadding;
   cnt <- 1;
@@ -256,6 +254,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
             }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+            }else if(altered == "Fusion"){
+              ytop2 <- ytop-0.1
+              ybottom2 <- ybottom+0.1
+              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
             }
             # second alteration
             altered <- alt2
@@ -265,7 +267,11 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
             }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
-            }
+            }else if(altered == "Fusion"){
+              ytop2 <- ytop-0.1
+              ybottom2 <- ybottom+0.1
+              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+              }
             
             
           }else{ # alteration does not have a comma
@@ -275,6 +281,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
             }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+            }else if(altered == "Fusion"){
+              ytop2 <- ytop-0.1
+              ybottom2 <- ybottom+0.1
+              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
             }
           }
           
@@ -302,6 +312,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
             oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
           }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" ||altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
             oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+          }else if(altered == "Fusion"){
+              ytop2 <- ytop-0.1
+              ybottom2 <- ybottom+0.1
+              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
           }else{
             oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
           }
@@ -329,6 +343,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   cnt <- nsamples*ngenes
   colors <- rep(NA, cnt)
   colors.scna <- rep(NA, cnt)
+  colors.fusion <- rep(NA, cnt)
   colors[ which(oncoCords[, "altered"] == "Mutation") ] <- "#26A818"
   colors[ which(oncoCords[, "altered"] == "Missense") ] <- "#26A818"
   colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- "black"
@@ -345,11 +360,12 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors.scna[ which(oncoCords.scna[, "altered"] == "LOH") ] <- "darkkhaki"
   colors.scna[ which(oncoCords.scna[, "altered"] == "homodel") ] <- "brown4"
   colors.scna[ which(oncoCords.scna[, "altered"] == "CNLOH") ] <- "deepskyblue"
-  #colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "#EA2E49"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "blue"
-  #colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "#174D9D"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "red"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "#EA2E49"
+  #colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "blue"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "#174D9D"
+  #colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "red"
   
+  colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- "darkgrey"
   c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
   
   #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
@@ -384,6 +400,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
+    rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
     
     axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
@@ -407,6 +424,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F);
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
+    rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
     
     axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
