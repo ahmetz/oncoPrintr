@@ -66,6 +66,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           return(x[grep("None", x[i]) ])
         }
       }
+      cat("Finished filtering\n")
     }
     df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
   }
