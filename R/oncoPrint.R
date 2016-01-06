@@ -98,6 +98,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
   if(merge_scnas && !is.na(annotation)){
     alts <- acast(df, Gene ~ Sample)
+    cat("There are ", length(df2), "additional data frames to process\n")
     for (dframe in df2){
       cat("Preparing additional data frames for input\n")
       colnames(dframe) <- c("Sample", "Gene", "VarClass")
