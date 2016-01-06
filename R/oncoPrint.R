@@ -28,8 +28,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     cat("Filtering duplicates\n")
     choose_alteration_type <- function(x){
       for (i in 1:length(x)){
-        #cat(length(x), "\n")
-        #cat(x[i, ]$Gene, ":", x[i, ], ":", i)
+        cat(length(x), "\n")
+        cat(x[i, ]$Gene, ":", x[i, ], ":", i)
         if(grepl("stopgain", x[i])){
           return(x[grep("stopgain", x[i])])
         }else if(grepl("insertion", x[i])){
