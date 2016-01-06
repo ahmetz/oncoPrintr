@@ -98,6 +98,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   if(merge_scnas && !is.na(annotation)){
     alts <- acast(df, Gene ~ Sample)
     cat("There are ", length(df2), "additional data frames to process\n")
+    
     for (dframe in df2){
       cat("Preparing additional data frames for input\n")
       colnames(dframe) <- c("Sample", "Gene", "VarClass")
@@ -111,6 +112,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       }
       alts2 <- acast(dframe, Gene ~ Sample)
       alts <- paste.matrix(alts, alts2)
+      cat("Merged Matrix:\n")
+      cat(alts)
     }
     cat("Finished additional data frames for input\n")
     alterations <- alts
@@ -160,9 +163,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     alterations.c <- acast(df, Gene ~ Sample, fun.aggregate = length) # This is the 0 and 1 version of the matrix
     alterations <- acast(df, Gene ~ Sample)
   }
-  
-  cat(alterations)
-  
+
   #convert variant type matrix to numerical values
   for (i in 1:nrow(alterations)){
     for(j in 1:ncol(alterations)){
