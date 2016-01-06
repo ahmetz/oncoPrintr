@@ -39,6 +39,9 @@ convert_varclass <- function(df){
   if(sum(grepl("IntragenicDeletion", df$VarClass) > 0)){
     df[grep("IntragenicDeletion", df$VarClass), ]["VarClass"] <- "Frameshift"
   }
+  if(sum(grepl("Fusion", df$VarClass) > 0)){
+    df[grep("Fusion", df$VarClass), ]["VarClass"] <- "Fusion"
+  }
   
   return(df)
 }
