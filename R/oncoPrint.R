@@ -114,7 +114,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       alts2 <- acast(dframe, Gene ~ Sample)
       alts <- paste.matrix(alts, alts2)
       cat("Merged Matrix:\n")
-      cat(alts)
+      
     }
     cat("Finished additional data frames for input\n")
     alterations <- alts
@@ -169,7 +169,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   for (i in 1:nrow(alterations)){
     for(j in 1:ncol(alterations)){
       altered <- alterations[i, j]
-      cat(altered, "\n")
+      
       if(!is.na(altered)){ # there is an alteration
         if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
           alts <- unlist(str_split(altered, ",")) # split the alterations
