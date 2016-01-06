@@ -66,7 +66,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       }
     }
     df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
-    
     cat("Finished filtering duplicates\n")
   }
   
