@@ -60,6 +60,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           return(x[grep("Amplification", x[i]) ])
         }else if(grepl("Deletion", x[i])){
           return(x[grep("Deletion", x[i]) ])
+        }else if(grepl("Yes", x[i])){
+          return(x[grep("Yes", x[i]) ])
+        }else if(grepl("No", x[i])){
+          return(x[grep("No", x[i]) ])
         }else{
           return(x)
         }
