@@ -65,7 +65,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
         }
       }
     }
-    df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
+    df <- df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
+    #df %>% group_by(Gene, Sample) %>% unique() %>% ungroup()
     cat("Finished filtering duplicates\n")
     return(df)
   }
