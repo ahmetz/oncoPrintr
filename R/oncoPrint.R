@@ -28,8 +28,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     cat("Filtering duplicates\n")
     choose_alteration_type <- function(x){
       for (i in 1:length(x)){
-        cat(length(x), "\n")
-        cat(x[i, ]$Gene, ":", x[i, ], ":", i)
         if(grepl("stopgain", x[i])){
           return(x[grep("stopgain", x[i])])
         }else if(grepl("insertion", x[i])){
@@ -42,12 +40,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           return(x[grep("nonsynonymous", x[i]) ])
         }else if(grepl("upstream", x[i])){
           return(x[grep("upstream", x[i]) ])
-        }else if(grepl("Amplification", x[i])){
-          return(x[grep("Amplification", x[i]) ])
-        }else if(grepl("IntragenicDeletion", x[i])){
-          return(x[grep("IntragenicDeletion", x[i]) ])
-        }else if(grepl("Deletion", x[i])){
-          return(x[grep("Deletion", x[i]) ])
         }else if(grepl("Present", x[i])){
           return(x[grep("Present", x[i]) ])
         }else if(grepl("NotTested", x[i])){
@@ -64,6 +56,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           return(x[grep("None", x[i]) ])
         }else if(grepl("Fusion", x[i])){
           return(x[grep("Fusion", x[i]) ])
+        }else{
+          return(x)
         }
       }
     }
