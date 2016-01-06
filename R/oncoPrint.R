@@ -21,57 +21,57 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   # This is the plotting function
   library(reshape2)
   library(dplyr)
-
+  
   colnames(df) <- c("Sample", "Gene", "VarClass")
   if(!is.na(df2)){
     colnames(df2) <- c("Sample", "Gene", "VarClass")
   }
   
   remove_duplicates <- function(df){
-  cat("Filtering duplicates\n")
-  choose_alteration_type <- function(x){
-    for (i in 1:length(x)){
-      #cat(length(x), "\n")
-      #cat(x[i, ]$Gene, ":", x[i, ], ":", i)
-      if(grepl("stopgain", x[i])){
-        return(x[grep("stopgain", x[i])])
-      }else if(grepl("Fusion", x[i])){
-        return(x[grep("Fusion", x[i])])
-      }else if(grepl("insertion", x[i])){
-        return(x[grep("insertion", x[i])])
-      }else if(grepl("deletion", x[i])){
-        return(x[grep("deletion", x[i]) ])
-      }else if(grepl("splicing", x[i])){
-        return(x[grep("splicing", x[i]) ])
-      }else if(grepl("nonsynonymous", x[i])){
-        return(x[grep("nonsynonymous", x[i]) ])
-      }else if(grepl("upstream", x[i])){
-        return(x[grep("upstream", x[i]) ])
-      }else if(grepl("Amplification", x[i])){
-        return(x[grep("Amplification", x[i]) ])
-      }else if(grepl("IntragenicDeletion", x[i])){
-        return(x[grep("IntragenicDeletion", x[i]) ])
-      }else if(grepl("Deletion", x[i])){
-        return(x[grep("Deletion", x[i]) ])
-      }else if(grepl("Present", x[i])){
-        return(x[grep("Present", x[i]) ])
-      }else if(grepl("NotTested", x[i])){
-        return(x[grep("NotTested", x[i]) ])
-      }else if(grepl("del", x[i])){
-        return(x[grep("del", x[i]) ])
-      }else if(grepl("homo-del", x[i])){
-        return(x[grep("homo-del", x[i]) ])
-      }else if(grepl("CN-LOH", x[i])){
-        return(x[grep("CN-LOH", x[i]) ])
-      }else if(grepl("LOH", x[i])){
-        return(x[grep("LOH", x[i]) ])
-      }else if(grepl("None", x[i])){
-        return(x[grep("None", x[i]) ])
+    cat("Filtering duplicates\n")
+    choose_alteration_type <- function(x){
+      for (i in 1:length(x)){
+        #cat(length(x), "\n")
+        #cat(x[i, ]$Gene, ":", x[i, ], ":", i)
+        if(grepl("stopgain", x[i])){
+          return(x[grep("stopgain", x[i])])
+        }else if(grepl("Fusion", x[i])){
+          return(x[grep("Fusion", x[i])])
+        }else if(grepl("insertion", x[i])){
+          return(x[grep("insertion", x[i])])
+        }else if(grepl("deletion", x[i])){
+          return(x[grep("deletion", x[i]) ])
+        }else if(grepl("splicing", x[i])){
+          return(x[grep("splicing", x[i]) ])
+        }else if(grepl("nonsynonymous", x[i])){
+          return(x[grep("nonsynonymous", x[i]) ])
+        }else if(grepl("upstream", x[i])){
+          return(x[grep("upstream", x[i]) ])
+        }else if(grepl("Amplification", x[i])){
+          return(x[grep("Amplification", x[i]) ])
+        }else if(grepl("IntragenicDeletion", x[i])){
+          return(x[grep("IntragenicDeletion", x[i]) ])
+        }else if(grepl("Deletion", x[i])){
+          return(x[grep("Deletion", x[i]) ])
+        }else if(grepl("Present", x[i])){
+          return(x[grep("Present", x[i]) ])
+        }else if(grepl("NotTested", x[i])){
+          return(x[grep("NotTested", x[i]) ])
+        }else if(grepl("del", x[i])){
+          return(x[grep("del", x[i]) ])
+        }else if(grepl("homo-del", x[i])){
+          return(x[grep("homo-del", x[i]) ])
+        }else if(grepl("CN-LOH", x[i])){
+          return(x[grep("CN-LOH", x[i]) ])
+        }else if(grepl("LOH", x[i])){
+          return(x[grep("LOH", x[i]) ])
+        }else if(grepl("None", x[i])){
+          return(x[grep("None", x[i]) ])
+        }
       }
     }
+    df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
   }
-  df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
-}
   
   
   # check if there are any samples with no alterations. If so, remove them to add later on. 
@@ -85,7 +85,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       df <- df %>% filter(VarClass != "None")
     }
   }
-
+  
   #remove duplicates of gene events within the same sample.
   #TO-DO do not remove if a gene has both a copy number alteration and a mutation
   df <- remove_duplicates(df)
@@ -108,7 +108,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     df[grep("deletion", df$VarClass), ]["VarClass"] <- "Mutation"
     df[grep("upstream", df$VarClass), ]["VarClass"] <- "Mutation"
   }
-
+  
   
   # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
   if(merge_scnas && !is.na(annotation)){
@@ -151,7 +151,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     alterations.c <- acast(df, Gene ~ Sample, fun.aggregate = length) # This is the 0 and 1 version of the matrix
     alterations <- acast(df, Gene ~ Sample)
   }
-
+  
   #convert variant type matrix to numerical values
   for (i in 1:nrow(alterations)){
     for(j in 1:ncol(alterations)){
@@ -187,7 +187,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   
   ngenes <- nrow(alterations);
   nsamples <- ncol(alterations);
-
+  
   
   # if there any samples with no alterations, add them here: 
   if(!is.na(not_altered_sample_num) ){
@@ -229,7 +229,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   cat("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
   
   if (merge_scnas){ 
-
+    
     for(i in 1:ngenes) {
       for(j in 1:nsamples) {
         #cat("i: ", i, " j: ", j, "\n")
@@ -244,36 +244,19 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
         if(!is.na(altered)){ # there is an alteration
           if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
             alts <- unlist(str_split(altered, ",")) # split the alterations
-            alt1 <- alts[1] #assign them individually
-            alt2 <- alts[2]
-            # first alteration
-            altered <- alt1  
-            if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
-              ytop2 <- ytop-0.25
-              ybottom2 <- ybottom+0.25
-              oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
-              oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
-            }else if(altered == "Fusion"){
-              ytop2 <- ytop-0.1
-              ybottom2 <- ybottom+0.1
-              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }
-            # second alteration
-            altered <- alt2
-            if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
-              ytop2 <- ytop-0.25
-              ybottom2 <- ybottom+0.25
-              oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
-              oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
-            }else if(altered == "Fusion"){
-              ytop2 <- ytop-0.1
-              ybottom2 <- ybottom+0.1
-              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+            for (altered in alts){
+              if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
+                ytop2 <- ytop-0.25
+                ybottom2 <- ybottom+0.25
+                oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+              }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
+                oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+              }else if(altered == "Fusion"){
+                ytop2 <- ytop-0.1
+                ybottom2 <- ybottom+0.1
+                oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
               }
-            
-            
+            }
           }else{ # alteration does not have a comma
             if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
               ytop2 <- ytop-0.25
@@ -313,9 +296,9 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" ||altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
             oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
           }else if(altered == "Fusion"){
-              ytop2 <- ytop-0.1
-              ybottom2 <- ybottom+0.1
-              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+            ytop2 <- ytop-0.1
+            ybottom2 <- ybottom+0.1
+            oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
           }else{
             oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
           }
@@ -352,7 +335,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors[ which(oncoCords[, "altered"] == "Promoter") ] <- "#2986E2"
   colors[ which(oncoCords[, "altered"] == "InFrame") ] <- "#F26529"
   colors[ which(oncoCords[, "altered"] == "Present") ] <- "black"
-
+  
   colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2"
   colors.scna[ which(oncoCords.scna[, "altered"] == "NotPresent") ] <- "#DCD9D3"
   colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey"
@@ -405,7 +388,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     
     axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
     
-        
+    
     #add legend
     screen(3)
     par(mar=c(0,0,0,0))
