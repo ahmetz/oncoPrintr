@@ -89,19 +89,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   #remove duplicates of gene events within the same sample.
   #TO-DO do not remove if a gene has both a copy number alteration and a mutation
   df <- remove_duplicates(df)
-
-  
-  if(convert){# change the variant types to more general names
-    df <- convert_varclass(df)
-  }else{
-    df[grep("splicing", df$VarClass), ]["VarClass"] <- "Mutation"
-    df[grep("stop", df$VarClass), ]["VarClass"] <- "Mutation"
-    df[grep("nonsynonymous", df$VarClass), ]["VarClass"] <- "Mutation"
-    df[grep("insertion", df$VarClass), ]["VarClass"] <- "Mutation"
-    df[grep("deletion", df$VarClass), ]["VarClass"] <- "Mutation"
-    df[grep("upstream", df$VarClass), ]["VarClass"] <- "Mutation"
-  }
-  
+  df <- convert_varclass(df)
   
   # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
   if(merge_scnas && !is.na(annotation)){
