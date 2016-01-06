@@ -32,8 +32,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
         #cat(x[i, ]$Gene, ":", x[i, ], ":", i)
         if(grepl("stopgain", x[i])){
           return(x[grep("stopgain", x[i])])
-        }else if(grepl("Fusion", x[i])){
-          return(x[grep("Fusion", x[i])])
         }else if(grepl("insertion", x[i])){
           return(x[grep("insertion", x[i])])
         }else if(grepl("deletion", x[i])){
@@ -66,9 +64,9 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           return(x[grep("None", x[i]) ])
         }
       }
-     
     }
     df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass))
+    
     cat("Finished filtering duplicates\n")
   }
   
