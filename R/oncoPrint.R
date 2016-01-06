@@ -388,7 +388,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     for (i in 1:length(annotation_order)){
       subtype.labels <- c(subtype.labels, annotation_order[i])
       xright <- counts[which(counts$Var1 == annotation_order[i]), ]['Freq']
-      rect(xleft, 0, xleft + xright$Freq, 1, col = c48[i])
+      rect(xleft, 0, xleft + xright$Freq, 1, col = c48[i], border = "white")
       axis.points <- c(axis.points, (xleft + xleft+xright$Freq)/2)
       xleft <- xleft + xright$Freq
     }
