@@ -162,13 +162,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       if(!is.na(altered)){ # there is an alteration
         if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
           alts <- unlist(str_split(altered, ",")) # split the alterations
-          alt1 <- alts[1] #assign them individually
-          alt2 <- alts[2]
-          # first alteration
-          alt <- alt1
-          alterations.c[i, j] <- alteration_score[[alt]]
-          alt <- alt2
-          alterations.c[i, j] <- alterations.c[i, j] + alteration_score[[alt]]
+          alterations.c[i, j] <- 0
+          for (alt in alts){
+            alterations.c[i, j] <- alterations.c[i, j] + alteration_score[[alt]]
+          }
           
         }else{
           alt <- altered
