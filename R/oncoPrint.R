@@ -245,6 +245,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
             alts <- unlist(str_split(altered, ",")) # split the alterations
             for (altered in alts){
+              cat ("Gene: ", row.names[i], ", Alteration: ", altered, "\n")
               if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
                 ytop2 <- ytop-0.25
                 ybottom2 <- ybottom+0.25
