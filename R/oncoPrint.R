@@ -161,6 +161,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     alterations <- acast(df, Gene ~ Sample)
   }
   
+  cat(alterations)
+  
   #convert variant type matrix to numerical values
   for (i in 1:nrow(alterations)){
     for(j in 1:ncol(alterations)){
