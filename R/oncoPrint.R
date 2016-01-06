@@ -109,7 +109,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       alts <- paste.matrix(alts, alts2)
     }
     alterations <- alts
-    cat(alterations)
     colnames(annotation) <- c("sample", "class")
     annotation.samples <- annotation$sample
     
