@@ -97,7 +97,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
         dframe <- convert_varclass(dframe)
       }
       if(merge_scnas){
-        df2 <- remove_duplicates(df2)
+        dframe <- remove_duplicates(dframe)
       }
       alts2 <- acast(dframe, Gene ~ Sample)
       alts <- paste.matrix(alts, alts2)
@@ -130,8 +130,18 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     row.names(alterations.c) <- row.names(alterations)
   }else if(merge_scnas){
     alts <- acast(df, Gene ~ Sample)
-    alts2 <- acast(df2, Gene ~ Sample)
-    alterations <- paste.matrix(alts, alts2)
+    for (dframe in df2){
+      colnames(dframe) <- c("Sample", "Gene", "VarClass")
+      if(convert){
+        dframe <- convert_varclass(dframe)
+      }
+      if(merge_scnas){
+        dframe <- remove_duplicates(dframe)
+      }
+      alts2 <- acast(dframe, Gene ~ Sample)
+      alts <- paste.matrix(alts, alts2)
+    }
+    alterations <- alts
     alterations.c <- matrix(as.numeric(!is.na(alterations)), ncol = ncol(alterations))
     colnames(alterations.c) <- colnames(alterations)
     row.names(alterations.c) <- row.names(alterations)
