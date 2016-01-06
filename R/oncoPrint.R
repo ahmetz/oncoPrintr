@@ -93,10 +93,13 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     df <- convert_varclass(df)
   }
   cat("Finished preparing input files\n")
+  
+  
   # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
   if(merge_scnas && !is.na(annotation)){
     alts <- acast(df, Gene ~ Sample)
     for (dframe in df2){
+      cat("Preparing additional data frames for input\n")
       colnames(dframe) <- c("Sample", "Gene", "VarClass")
       if(convert){
         cat("Dimensions of df to convert : ", dim(dframe), "\n")
@@ -109,6 +112,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
       alts2 <- acast(dframe, Gene ~ Sample)
       alts <- paste.matrix(alts, alts2)
     }
+    cat("Finished additional data frames for input\n")
     alterations <- alts
     colnames(annotation) <- c("sample", "class")
     annotation.samples <- annotation$sample
