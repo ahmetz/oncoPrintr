@@ -42,6 +42,6 @@ convert_varclass <- function(df){
   if(sum(grepl("Fusion", df$VarClass) > 0)){
     df[grep("Fusion", df$VarClass), ]["VarClass"] <- "Fusion"
   }
-  
+  cat("Finished converting variant classes")
   return(df)
 }
