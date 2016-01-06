@@ -365,7 +365,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "#174D9D"
   #colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "red"
   
-  colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- "darkgrey"
+  colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- "#9BDCFF"
   c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
   
   #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
