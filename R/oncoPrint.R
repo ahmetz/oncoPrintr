@@ -180,7 +180,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           
         }else{
           alt <- altered
-          cat (alt, "\n")
           alterations.c[i, j] <- alteration_score[[alt]]
         }
       }else{
