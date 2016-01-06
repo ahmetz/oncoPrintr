@@ -23,9 +23,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   library(dplyr)
   
   colnames(df) <- c("Sample", "Gene", "VarClass")
-  if(!is.na(df2)){
-    colnames(df2) <- c("Sample", "Gene", "VarClass")
-  }
   
   remove_duplicates <- function(df){
     cat("Filtering duplicates\n")
@@ -95,6 +92,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   if(merge_scnas && !is.na(annotation)){
     alts <- acast(df, Gene ~ Sample)
     for (dframe in df2){
+      colnames(dframe) <- c("Sample", "Gene", "VarClass")
       if(convert){
         dframe <- convert_varclass(dframe)
       }
