@@ -88,12 +88,14 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   #remove duplicates of gene events within the same sample.
   #TO-DO do not remove if a gene has both a copy number alteration and a mutation
   cat("Preparing input files\n")
+  cat("Dim of df pre-process: ", dim(df), "\n")
   df <- remove_duplicates(df)
+  cat("Dim of df after duplicate removal: ", dim(df), "\n")
   if (convert){
     df <- convert_varclass(df)
   }
   cat("Finished preparing input files\n")
-  cat("Dim of df: ", dim(df), "\n")
+  cat("Dim of df after class conversion: ", dim(df), "\n")
   return(df)
   # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
   if(merge_scnas && !is.na(annotation)){
