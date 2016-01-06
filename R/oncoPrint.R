@@ -89,17 +89,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   #remove duplicates of gene events within the same sample.
   #TO-DO do not remove if a gene has both a copy number alteration and a mutation
   df <- remove_duplicates(df)
-  if(merge_scnas){
-    df2 <- remove_duplicates(df2)
-  }
+
   
   if(convert){# change the variant types to more general names
     df <- convert_varclass(df)
-    if(merge_scnas){
-      df2 <- convert_varclass(df2)
-      
-    }
-    
   }else{
     df[grep("splicing", df$VarClass), ]["VarClass"] <- "Mutation"
     df[grep("stop", df$VarClass), ]["VarClass"] <- "Mutation"
@@ -113,8 +106,17 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
   if(merge_scnas && !is.na(annotation)){
     alts <- acast(df, Gene ~ Sample)
-    alts2 <- acast(df2, Gene ~ Sample)
-    alterations <- paste.matrix(alts, alts2)
+    for (dframe in df2){
+      if(convert){
+        dframe <- convert_varclass(dframe)
+      }
+      if(merge_scnas){
+        df2 <- remove_duplicates(df2)
+      }
+      alts2 <- acast(dframe, Gene ~ Sample)
+      alts <- paste.matrix(alts, alts2)
+    }
+    alterations <- alts
     colnames(annotation) <- c("sample", "class")
     annotation.samples <- annotation$sample
     
@@ -245,7 +247,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
             alts <- unlist(str_split(altered, ",")) # split the alterations
             for (altered in alts){
-              cat ("Gene: ", row.names(alterations)[i], ", Alteration: ", altered, "\n")
               if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
                 ytop2 <- ytop-0.25
                 ybottom2 <- ybottom+0.25
