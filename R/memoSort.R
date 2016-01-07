@@ -23,16 +23,13 @@ memoSort <- function(M, geneOrder = geneOrder, annotations = NA, annotation_orde
     for(class in annotation_order){
       samples <- annotations[which(annotations[, 2] == class), ][, 1]
       sub_mat <- M[, which(colnames(M)%in%samples$sample), drop=FALSE]
-      
       if (ncol(sub_mat) == 1){
         M2 <- cbind(M2, sub_mat[, 1,drop=F])
       }else{
-        
-        
         sub_mat.t <- t(sub_mat)
         sub_mat.t <-  sub_mat.t[do.call(order, as.data.frame(sub_mat.t)), ]
         sub_mat <- t(sub_mat.t)
-        cat(sub_mat)
+        print(sub_mat)
         sub_mat <- sub_mat[, ncol(sub_mat):1]
         M2 <- cbind(M2, sub_mat)
       }
