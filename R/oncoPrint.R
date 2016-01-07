@@ -207,11 +207,11 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
             alts <- unlist(str_split(altered, ",")) # split the alterations
             for (altered in alts){
-              if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame" || altered == "Yes" || altered == "No") {
+              if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame" ) {
                 ytop2 <- ytop-0.25
                 ybottom2 <- ybottom+0.25
                 oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-              }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
+              }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"|| altered == "Yes" || altered == "No"){
                 oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
               }else if(altered == "Fusion"){
                 ytop2 <- ytop-0.1
@@ -220,11 +220,11 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
               }
             }
           }else{ # alteration does not have a comma
-            if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame"|| altered == "Yes" || altered == "No") {
+            if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
               ytop2 <- ytop-0.25
               ybottom2 <- ybottom+0.25
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
+            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH" || altered == "Yes" || altered == "No"){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
             }else if(altered == "Fusion"){
               ytop2 <- ytop-0.1
@@ -251,11 +251,11 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
         oncoCords.base[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
         #browser()
         if(!is.na(altered)){
-          if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame"|| altered == "Yes" || altered == "No") {
+          if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
             ytop2 <- ytop-0.25
             ybottom2 <- ybottom+0.25
             oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-          }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" ||altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"){
+          }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" ||altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH" || altered == "Yes" || altered == "No"){
             oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
           }else if(altered == "Fusion"){
             ytop2 <- ytop-0.1
@@ -297,8 +297,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors[ which(oncoCords[, "altered"] == "Promoter") ] <- "#2986E2"
   colors[ which(oncoCords[, "altered"] == "InFrame") ] <- "#F26529"
   colors[ which(oncoCords[, "altered"] == "Present") ] <- "black"
-  colors[ which(oncoCords[, "altered"] == "Yes") ] <- "#12C8F9"
-  colors[ which(oncoCords[, "altered"] == "No") ] <- "#155B6B"
+
   
   colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2"
   colors.scna[ which(oncoCords.scna[, "altered"] == "NotPresent") ] <- "#DCD9D3"
@@ -309,6 +308,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   colors.scna[ which(oncoCords.scna[, "altered"] == "CNLOH") ] <- "deepskyblue"
   colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "#EA2E49"
   colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "#174D9D"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Yes") ] <- "#12C8F9"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "No") ] <- "#155B6B"
   
   colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- "#D38C1F"
   c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
