@@ -29,8 +29,6 @@ memoSort <- function(M, geneOrder = geneOrder, annotations = NA, annotation_orde
         sub_mat.t <- t(sub_mat)
         sub_mat.t <-  sub_mat.t[do.call(order, as.data.frame(sub_mat.t)), ]
         sub_mat <- t(sub_mat.t)
-        cat(dim(sub_mat), "\n")
-        print(sub_mat)
         sub_mat <- sub_mat[, ncol(sub_mat):1]
         M2 <- cbind(M2, sub_mat)
       }
