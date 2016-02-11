@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples TODO2
-memoSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_order = NULL) {
+sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_order = NULL) {
   print(geneOrder)
   cat (row.names(M), "\n")
   M <- M[geneOrder, ]
