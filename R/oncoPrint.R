@@ -393,11 +393,15 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     if(printSamples){
       text((1:nsamples)-.5, par("usr")[3]+.3,srt=45, adj = 1,  labels = colnames(alterations), xpd=T, cex = 0.6)
     }
+    legend(x = 0, y = -2, names(onco_colors), fill = unlist(onco_colors), horiz = T, border = F, cex = 0.9, bty = "n" )
     #add legend
     screen(2)
     par(mar=c(0,0,0,0))
-    legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation", "In-Frame mutation", "Promoter mutation"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
-    legend(x="bottomleft", c( "Amplification", "Deletion", "Present", "LOH" ,"CNLOH"), fill = c('blue', 'red', 'darkorchid2', 'darkkhaki', 'deepskyblue'), horiz=T, border = F, cex=0.9, bty = 'n')
+    legend(x = 0, y = 3, names(onco_colors[names(onco_colors) %in% mutation_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations]), horiz = F, border = F, cex = 0.9, bty = "n" )
+    legend(x =1 * nsamples/3, y = 3, names(onco_colors[names(onco_colors) %in% scna_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations]), horiz = F, border = F, cex = 0.9, bty = "n" )
+    legend(x = 2 *nsamples/3, y = 3, names(onco_colors[names(onco_colors) %in% fusion_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations]), horiz = F, border = F, cex = 0.9, bty = "n" )
+    #legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation", "In-Frame mutation", "Promoter mutation"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
+    #legend(x="bottomleft", c( "Amplification", "Deletion", "Present", "LOH" ,"CNLOH"), fill = c('blue', 'red', 'darkorchid2', 'darkkhaki', 'deepskyblue'), horiz=T, border = F, cex=0.9, bty = 'n')
     close.screen(all.screens = TRUE)
   }
   par(def.par) 
