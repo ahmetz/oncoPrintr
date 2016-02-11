@@ -1,26 +1,30 @@
-#' oncoPrint
+#' oncoPrint 
+#' 
+#' This function creates onco prints of genomic data based on mutations, copy number alterations, fusions, and other user defined categories. For each category 3 fields are required : Sample ID, Gene, and Variant Class. There are options to display binary events as well as continous variables. 
 #'
 #' @param df  this is the dataframe used to plot oncoprints. required colnames: Sample, Gene, VarClass
 #' @param sort Boelean indicating whether genes should be sorted or now (default: True)
 #' @param convert Boelean indicating whether varclasses should be converted to more standard names (default: True)
 #' @param total_samples Total number of samples. If not given, total row numbers of input will be used
-#' @param geneName IF given, this gene sits on top of the oncoprint, it won't be used in sorting
-#' @param annotations If given, these will be used for pre-clustering
-#' @param annotation_order a list of annotation items to be displayed
+#' @param geneName If given, genes are not automatically sorted. Instead this variable is used for sorting. Partial list of genes can be input
+#' @param annotations If given, these will be used for creating sub-groups of samples. Clustering will happen within annotatoion groups and then merged
+#' @param annotation_order This is the order of annotation categories to display. Required if annotations are given
 #' @param merge_scnas Bolean indicating whether to plot scnas and mutations together superimposed (default: False)
-#' @param second_df if merge_scnas is True, this is the second set of events to be merged
+#' @param df2 If multiple classes of alterations or clinical data points are to be merged, input your list of dataframes here. 
 #' @param alteration_score this list determines the relative importance of different genomic alterations. Amplification > Deletion > Mutations etc.
 #' @param printSamples Bolean indicating whether sample names should be printed under the oncoprint
-#'
-#' @return oncoPrint image
+#' @param xpadding numerical value of the padding between two consecutive data columns
+#' @param ypadding numerical value of the padding between two consecutive data rows
+
+#' @return oncoPrint image and a list of values
 #' @export
 #'
 #' @examples TODO
 
-oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneName = NA, annotation = NA, annotation_order = NA, merge_scnas = F, df2 = NA, colors = list(Amplification = "red", Deletion = "blue"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T, xpadding = 0.1, ypadding = 0.1) {
+oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneName = NULL, annotation = NULL, annotation_order = NULL, merge_scnas = F, df2 = NULL, colors = list(Amplification = "red", Deletion = "blue"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T, xpadding = 0.1, ypadding = 0.1) {
   # This is the plotting function
-  library(reshape2)
-  library(dplyr)
+  require(reshape2)
+  require(dplyr)
   
   colnames(df) <- c("Sample", "Gene", "VarClass")
   
@@ -29,10 +33,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   not_altered_sample_num <- NA
   not_altered_sample_names <- NA
   if(!merge_scnas){
-    if(nrow(df %>% filter(VarClass == "None")) > 0){
-      not_altered_sample_num <- nrow(df %>% filter(VarClass == "None"))
-      not_altered_sample_names <- df %>% filter(VarClass == "None") %>% select(Sample)
-      df <- df %>% filter(VarClass != "None")
+    if(nrow(df %>% dplyr::filter(VarClass == "None")) > 0){
+      not_altered_sample_num <- nrow(df %>% dplyr::filter(VarClass == "None"))
+      not_altered_sample_names <- df %>% dplyr::filter(VarClass == "None") %>% select(Sample)
+      df <- df %>% dplyr::filter(VarClass != "None")
     }
   }
   
@@ -48,7 +52,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   cat("Finished preparing input files\n")
   cat("Dim of df after class conversion: ", dim(df), "\n")
   # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
-  if(merge_scnas && !is.na(annotation)){
+  if(merge_scnas && !is.null(annotation)){
     alts <- acast(df, Gene ~ Sample)
     cat("There are ", length(df2), "additional data frames to process\n")
     
@@ -82,7 +86,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     colnames(alterations.c) <- colnames(alterations)
     row.names(alterations.c) <- row.names(alterations)
     
-  }else if(!is.na(annotation)){
+  }else if(!is.null(annotation)){
     alterations <- acast(df, Gene ~ Sample)
     colnames(annotation) <- c("sample", "class")
     annotation.samples <- annotation$sample
@@ -141,10 +145,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   }
   
   # Order the samples
-  if(is.na(geneName)){
+  if(is.null(geneName)){
     geneName <- row.names(alterations)
   }
-  alterations.c <- memoSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
+  alterations.c <- sampleSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
   alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
   
   ngenes <- nrow(alterations);
@@ -160,7 +164,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   
   # check the total_samples variable. If there is a value given, make sure the # of samples match that
   nsamples <- ncol(alterations)
-  if(!is.na(total_samples)){
+  if(!is.null(total_samples)){
     if(total_samples != nsamples){
       diff <- total_samples - nsamples
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
@@ -170,25 +174,31 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     }
   }
   
+  
+  ### Set up the matrices that will hold the coordinates for the oncoprints for variety of alterations
   ngenes <- nrow(alterations)
   nsamples <- ncol(alterations)
-  #cat("#ofGenes: ", ngenes, " # of Samples: ", nsamples)
-  ### OncoPrint
   numOfOncos <- ngenes*nsamples
   oncoCords.base <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
-  oncoCords <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
   colnames(oncoCords.base) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+  oncoCords <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
   colnames(oncoCords) <- c("xleft", "ybottom", "xright", "ytop", "altered")
-  #crate a third matrix for copy number calls. this will be a second layer on top of grey background rects
-  oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
-  colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered");
-  oncoCords.fusion <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos );
-  colnames(oncoCords.fusion) <- c("xleft", "ybottom", "xright", "ytop", "altered");
-  xpadding <- xpadding;
-  ypadding <- ypadding;
+  oncoCords.scna <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
+  colnames(oncoCords.scna) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+  oncoCords.fusion <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
+  colnames(oncoCords.fusion) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+  oncoCords.borders <- matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
+  colnames(oncoCords.borders) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+  xpadding <- xpadding
+  ypadding <- ypadding
   cnt <- 1;
   
-  cat("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
+  message("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
+  
+  mutation_alterations <- c("Mutation" ,  "Missense" , "Nonsense" , "Splicing" ,  "Frameshift" ,  "Promoter" , "InFrame")
+  scna_alterations <- c("Amplification" , "Deletion" , "Present" , "NotPresent" , "NotTested", "homodel" , "del" , "CNLOH" , "LOH", "Yes" , "No", "Unknown")
+  fusion_alterations <- c("Fusion")
+  border_alterations <- c("Pathogenic")
   
   if (merge_scnas){ 
     
@@ -207,26 +217,26 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
           if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
             alts <- unlist(str_split(altered, ",")) # split the alterations
             for (altered in alts){
-              if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame" ) {
+              if(altered %in% mutation_alterations) {
                 ytop2 <- ytop-0.25
                 ybottom2 <- ybottom+0.25
                 oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-              }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested"|| altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH"|| altered == "Yes" || altered == "No"){
+              }else if( altered %in% scna_alterations){
                 oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
-              }else if(altered == "Fusion"){
+              }else if(altered %in% fusion_alterations){
                 ytop2 <- ytop-0.1
                 ybottom2 <- ybottom+0.1
                 oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
               }
             }
           }else{ # alteration does not have a comma
-            if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
+            if(altered %in% mutation_alterations) {
               ytop2 <- ytop-0.25
               ybottom2 <- ybottom+0.25
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" || altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH" || altered == "Yes" || altered == "No"){
+            }else if( altered %in% scna_alterations){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
-            }else if(altered == "Fusion"){
+            }else if(altered %in% fusion_alterations){
               ytop2 <- ytop-0.1
               ybottom2 <- ybottom+0.1
               oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
@@ -251,13 +261,13 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
         oncoCords.base[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
         #browser()
         if(!is.na(altered)){
-          if(altered == "Mutation" || altered == "Missense" || altered == "Nonsense" ||altered == "Splicing" || altered == "Frameshift" || altered == "Promoter" || altered == "InFrame") {
+          if(altered %in% mutation_alterations) {
             ytop2 <- ytop-0.25
             ybottom2 <- ybottom+0.25
             oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-          }else if( altered == "Amplification" || altered == "Deletion" || altered == "Present" || altered == "NotPresent" ||altered == "NotTested" || altered == "homodel" || altered == "del" || altered == "CNLOH" || altered == "LOH" || altered == "Yes" || altered == "No"){
+          }else if( altered %in% scna_alterations){
             oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
-          }else if(altered == "Fusion"){
+          }else if(altered %in% fusion_alterations){
             ytop2 <- ytop-0.1
             ybottom2 <- ybottom+0.1
             oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
@@ -274,7 +284,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
   
   labels = rownames(alterations)
   gene_prcnt <- list()
-  if(!is.na(total_samples)){
+  if(!is.null(total_samples)){
     labels=list()
     for(i in (1:nrow(alterations))){
       gene = row.names(alterations)[i]
@@ -285,43 +295,48 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NA, geneNam
     }
   }
   
+  
+  
+  ## Set up color schema for different classes of alterations
   cnt <- nsamples*ngenes
   colors <- rep(NA, cnt)
   colors.scna <- rep(NA, cnt)
   colors.fusion <- rep(NA, cnt)
-  colors[ which(oncoCords[, "altered"] == "Mutation") ] <- "#26A818"
-  colors[ which(oncoCords[, "altered"] == "Missense") ] <- "#26A818"
-  colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- "black"
-  colors[ which(oncoCords[, "altered"] == "Splicing") ] <- "#A05E35"
-  colors[ which(oncoCords[, "altered"] == "Frameshift") ] <- "#A05E35"
-  colors[ which(oncoCords[, "altered"] == "Promoter") ] <- "#2986E2"
-  colors[ which(oncoCords[, "altered"] == "InFrame") ] <- "#F26529"
-  colors[ which(oncoCords[, "altered"] == "Present") ] <- "black"
+  colors[ which(oncoCords[, "altered"] == "Mutation") ] <- onco_colors[["Mutation"]]
+  colors[ which(oncoCords[, "altered"] == "Missense") ] <- onco_colors[["Missense"]]
+  colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- onco_colors[["Nonsense"]]
+  colors[ which(oncoCords[, "altered"] == "Splicing") ] <- onco_colors[["Splicing"]]
+  colors[ which(oncoCords[, "altered"] == "Frameshift") ] <- onco_colors[["Frameshift"]]
+  colors[ which(oncoCords[, "altered"] == "Promoter") ] <- onco_colors[["Promoter"]]
+  colors[ which(oncoCords[, "altered"] == "InFrame") ] <- onco_colors[["InFrame"]]
+  colors[ which(oncoCords[, "altered"] == "Present") ] <- onco_colors[["Present"]]
 
   
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- "darkorchid2"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "NotPresent") ] <- "#DCD9D3"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- "darkgrey"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "del") ] <- "red"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "LOH") ] <- "darkkhaki"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "homodel") ] <- "brown4"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "CNLOH") ] <- "deepskyblue"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- "#EA2E49"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- "#174D9D"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Yes") ] <- "#155B6B"
-  colors.scna[ which(oncoCords.scna[, "altered"] == "No") ] <- "#12C8F9"
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- onco_colors[["Present"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "NotPresent") ] <- onco_colors[["NotPresent"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- onco_colors[["NotTested"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "del") ] <- onco_colors[["del"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "LOH") ] <- onco_colors[["LOH"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "homodel") ] <- onco_colors[["homodel"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "CNLOH") ] <- onco_colors[["CNLOH"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- onco_colors[["Amplification"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- onco_colors[["Deletion"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Yes") ] <- onco_colors[["Yes"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "No") ] <- onco_colors[["No"]]
+  colors.scna[ which(oncoCords.scna[, "altered"] == "Unknown") ] <- onco_colors[["Unknown"]]
   
-  colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- "#D38C1F"
+  colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- onco_colors[["Fusion"]]
+  
   c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
   
-  #cat("\n", "samples*genes: ", cnt, "length of colors", length(colors))
+ 
   #change the 
   def.par <- par(no.readonly = TRUE)
   leftmargin = 1/nsamples*500 
   if(leftmargin > 20){leftmargin <- 20}
   bottommargin = 1/ngenes*500
   if(bottommargin > 5){bottommargin <- 1}
-  if(!is.na(annotation)){
+  if(!is.null(annotation)){
     
     split.screen(rbind(c(0.05, 0.95, 0.95, 0.99), c(0.05,0.95,0.15, 0.94), c(0.05, 0.95, 0.01, 0.15)))
     screen(1)

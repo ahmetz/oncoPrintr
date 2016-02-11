@@ -1,19 +1,19 @@
-#' memoSort
+#' sampleSort
 #'
 #' @param M matrix of alterations.
 #' @param geneName If certain genes needs to be on the top, this value should provide them in a list
 #' @param annotations this holds the per sample annotation values. the matrix will be split into n sub matrices and sorted then merged at the end.
-#' @param annotation_order specify the order of the annotation. If not present, R will sort it alphabetically
+#' @param annotation_order (Required) specify the order of the annotation. If not present, R will sort it alphabetically
 #'
 #' @return matrix with samples and genes sorted
 #' @export
 #'
 #' @examples TODO2
-memoSort <- function(M, geneOrder = geneOrder, annotations = NA, annotation_order = NA) {
+memoSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_order = NULL) {
   print(geneOrder)
   cat (row.names(M), "\n")
   M <- M[geneOrder, ]
-  if(!is.na(annotations)){
+  if(!is.null(annotations)){
     colnames(annotations) <- c("sample", "class")
     classes <- unique(annotations$class)
     M2 <- matrix(nrow=nrow(M))
