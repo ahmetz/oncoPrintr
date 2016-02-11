@@ -136,6 +136,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
           
         }else{
           alt <- altered
+          message(alt)
           alterations.c[i, j] <- alteration_score[[alt]]
         }
       }else{
