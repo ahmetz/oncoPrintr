@@ -120,7 +120,6 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     alterations.c <- acast(df, Gene ~ Sample, fun.aggregate = length) # This is the 0 and 1 version of the matrix
     alterations <- acast(df, Gene ~ Sample)
   }
-
   #convert variant type matrix to numerical values
   for (i in 1:nrow(alterations)){
     for(j in 1:ncol(alterations)){
