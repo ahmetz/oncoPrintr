@@ -45,8 +45,8 @@
         }
       }
     }
-    #df <- df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass)) %>% ungroup()
-    df %>% group_by(Gene, Sample) %>% unique() %>% ungroup()
+    df <- df %>% group_by(Gene, Sample) %>% summarise(VarClass = choose_alteration_type(VarClass)) %>% ungroup()
+    #df %>% group_by(Gene, Sample) %>% unique() %>% ungroup()
     cat("Finished filtering duplicates\n")
     return(df)
   }

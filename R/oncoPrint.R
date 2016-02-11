@@ -127,6 +127,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
       altered <- alterations[i, j]
       
       if(!is.na(altered)){ # there is an alteration
+        message(altered)
         if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
           alts <- unlist(str_split(altered, ",")) # split the alterations
           alterations.c[i, j] <- 0
