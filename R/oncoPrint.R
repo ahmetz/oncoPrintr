@@ -23,6 +23,7 @@
 #' @import reshape2
 #' @import dplyr
 #' @import grid
+#' @import stringr
 
 oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneName = NULL, annotation = NULL, annotation_order = NULL, merge_scnas = F, df2 = NULL, onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#A05E35", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", del = "red", LOH = "darkkhaki", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", Fusion =  "#D38C1F"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T, xpadding = 0.1, ypadding = 0.1) {
   # This is the plotting function
@@ -203,17 +204,21 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
   fusion_alterations <- c("Fusion")
   border_alterations <- c("Pathogenic")
   
+  barplot_data <- matrix(rep(0, 3*ngenes), nrow = 3)
+  colnames(barplot_data) <- row.names(alterations)
+  row.names(barplot_data) <- c("Mutation", "SCNA", "Fusion")
+  
   if (merge_scnas){ 
     
     for(i in 1:ngenes) {
       for(j in 1:nsamples) {
-        #cat("i: ", i, " j: ", j, "\n")
+        gene <- row.names(alterations)[i]
         altered <- alterations[i, j]
-        xleft <- j-1 + xpadding ;
-        ybottom <- ((ngenes-i+1) -1) + ypadding;
-        xright <- j - xpadding ;
-        ytop <- (ngenes-i+1) -ypadding;
-        oncoCords.base[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+        xleft <- j-1 + xpadding 
+        ybottom <- ((ngenes-i+1) -1) + ypadding
+        xright <- j - xpadding 
+        ytop <- (ngenes-i+1) -ypadding
+        oncoCords.base[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
         #browser()
         
         if(!is.na(altered)){ # there is an alteration
@@ -223,26 +228,37 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
               if(altered %in% mutation_alterations) {
                 ytop2 <- ytop-0.25
                 ybottom2 <- ybottom+0.25
-                oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-              }else if( altered %in% scna_alterations | altered %in% misc_alterations){
-                oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+                oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
+                barplot_data["Mutation", gene] <- barplot_data["Mutation", gene] + 1 
+              }else if( altered %in% scna_alterations ){
+                oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
+                barplot_data["SCNA", gene] <- barplot_data["SCNA", gene] + 1
+              }else if( altered %in% misc_alterations){
+                oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
+                
               }else if(altered %in% fusion_alterations){
                 ytop2 <- ytop-0.1
                 ybottom2 <- ybottom+0.1
-                oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+                oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
+                barplot_data["Fusion", gene] <- barplot_data["Fusion", gene] + 1
               }
             }
           }else{ # alteration does not have a comma
             if(altered %in% mutation_alterations) {
               ytop2 <- ytop-0.25
               ybottom2 <- ybottom+0.25
-              oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered %in% scna_alterations | altered %in% misc_alterations){
-              oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+              oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
+              barplot_data["Mutation", gene] <- barplot_data["Mutation", gene] + 1 
+            }else if( altered %in% scna_alterations ){
+              oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
+              barplot_data["SCNA", gene] <- barplot_data["SCNA", gene] + 1
+            }else if(  altered %in% misc_alterations){
+              oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
             }else if(altered %in% fusion_alterations){
               ytop2 <- ytop-0.1
               ybottom2 <- ybottom+0.1
-              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+              oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
+              barplot_data["Fusion", gene] <- barplot_data["Fusion", gene] + 1
             }
           }
           
@@ -256,29 +272,34 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
   }else{
     for(i in 1:ngenes) {
       for(j in 1:nsamples) {
-        altered <- alterations[i, j];
-        xleft <- j-1 + xpadding ;
-        ybottom <- ((ngenes-i+1) -1) + ypadding;
-        xright <- j - xpadding ;
-        ytop <- (ngenes-i+1) -ypadding;
-        oncoCords.base[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+        gene <- row.names(alterations)[i]
+        altered <- alterations[i, j]
+        xleft <- j-1 + xpadding 
+        ybottom <- ((ngenes-i+1) -1) + ypadding
+        xright <- j - xpadding 
+        ytop <- (ngenes-i+1) -ypadding
+        oncoCords.base[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
         #browser()
         if(!is.na(altered)){
           if(altered %in% mutation_alterations) {
             ytop2 <- ytop-0.25
             ybottom2 <- ybottom+0.25
-            oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+            oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
+            barplot_data["Mutation", gene] <- barplot_data["Mutation", gene] + 1 
           }else if( altered %in% scna_alterations){
-            oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+            oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
+          }else if(  altered %in% misc_alterations){
+            oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
           }else if(altered %in% fusion_alterations){
             ytop2 <- ytop-0.1
             ybottom2 <- ybottom+0.1
-            oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
+            oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
+            barplot_data["Fusion", gene] <- barplot_data["Fusion", gene] + 1
           }else{
-            oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+            oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
           }
         }else{
-          oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
+          oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
         }
         cnt <- cnt+1;
       }
@@ -298,7 +319,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     }
   }
   
-  
+  print(barplot_data)
   
   ## Set up color schema for different classes of alterations
   cnt <- nsamples*ngenes
@@ -379,7 +400,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     close.screen(all.screens = TRUE)
     
   }else{
-    split.screen(rbind(c(0.05,0.95,0.15, 0.95), c(0.05, 0.95, 0.05, 0.15)))
+    split.screen(rbind(c(0.01,0.85,0.15, 0.99), c(0.01, 0.85, 0.01, 0.15), c(0.85, 0.99, 0.15, 0.99), c(0.86, 0.99, 0.01, 0.15)))
     screen(1)
     
     par(mar=c(1,10,0.25, 1)+0.1)
@@ -398,12 +419,14 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     #add legend
     screen(2)
     par(mar=c(0,0,0,0))
-    legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" )
-    legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" )
-    legend(x = 0.75, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" )
-    legend(x = 0.9, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" )
+    legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
+    legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
+    legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
+    legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
     #legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation", "In-Frame mutation", "Promoter mutation"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
     #legend(x="bottomleft", c( "Amplification", "Deletion", "Present", "LOH" ,"CNLOH"), fill = c('blue', 'red', 'darkorchid2', 'darkkhaki', 'deepskyblue'), horiz=T, border = F, cex=0.9, bty = 'n')
+    
+    
     close.screen(all.screens = TRUE)
   }
   par(def.par) 
