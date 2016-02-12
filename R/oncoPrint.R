@@ -288,6 +288,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
             barplot_data["Mutation", gene] <- barplot_data["Mutation", gene] + 1 
           }else if( altered %in% scna_alterations){
             oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
+            barplot_data["SCNA", gene] <- barplot_data["SCNA", gene] + 1
           }else if(  altered %in% misc_alterations){
             oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
           }else if(altered %in% fusion_alterations){
@@ -319,7 +320,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     }
   }
   
-  print(barplot_data)
+  barplot_data <- barplot_data[, match(rownames(alterations), colnames(barplot_data))]
+  
   
   ## Set up color schema for different classes of alterations
   cnt <- nsamples*ngenes
@@ -404,7 +406,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     screen(1)
     
     par(mar=c(1,10,0.25, 1)+0.1)
-    plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F);
+    plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F, xaxs = "i");
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
@@ -425,8 +427,12 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
     #legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation", "In-Frame mutation", "Promoter mutation"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
     #legend(x="bottomleft", c( "Amplification", "Deletion", "Present", "LOH" ,"CNLOH"), fill = c('blue', 'red', 'darkorchid2', 'darkkhaki', 'deepskyblue'), horiz=T, border = F, cex=0.9, bty = 'n')
-    
-    
+    screen(3)
+    par(mar=c(2.85,0,2,0))
+    barplot(barplot_data[, rev(colnames(barplot_data))], horiz = T, axisnames = F, col= c("#2986E2", "#F26529", "#619744"), border = "white", xlab = paste("Total Samples = ", total_samples, sep=""), cex.names = 0.5, cex.axis = 0.5, yaxs = "i")
+    screen(4)
+    par(mar=c(0,0,0,0))
+    legend(x = 0, y = .5,c("Mutations", "SCNA", "Fusion"), fill = c("#2986E2", "#F26529", "#619744"), bty="n")
     close.screen(all.screens = TRUE)
   }
   par(def.par) 
@@ -436,6 +442,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
   res$geneOrder <- rownames(alterations)
   res$gene_prcnt <- gene_prcnt
   res$alterations.value <- alterations.c
+  res$barplot_data <- barplot_data
   res
 }
 

@@ -1,7 +1,7 @@
 Package: oncoPrintr
 Type: Package
 Title: Create oncoPrints Based on Genomic Data
-Version: 0.3
+Version: 0.4
 Date: 2015-05-25
 Author: Ahmet Zehir
 Maintainer: Ahmet Zehir <ahmetzehir@gmail.com>
@@ -12,5 +12,6 @@ LazyData: TRUE
 Imports:
     magrittr,
     dplyr,
-    reshape2
+    reshape2,
+    stringr
 RoxygenNote: 5.0.1

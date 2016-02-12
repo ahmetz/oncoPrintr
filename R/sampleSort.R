@@ -10,10 +10,7 @@
 #'
 #' @examples TODO2
 sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_order = NULL) {
-  if(!colnames(M) %in% geneOrder){
-    message("A gene supplied in the gene order is missing from the alterations matrix! ")
-    stop()
-  }
+
   M <- M[geneOrder, ]
   if(!is.null(annotations)){
     colnames(annotations) <- c("sample", "class")
