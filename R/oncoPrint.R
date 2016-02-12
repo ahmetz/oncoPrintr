@@ -378,9 +378,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     close.screen(all.screens = TRUE)
     
   }else{
-    #split.screen(rbind(c(0.05,0.95,0.15, 0.95), c(0.05, 0.95, 0.05, 0.15)))
-    
-    #add oncoprints
+    split.screen(rbind(c(0.05,0.95,0.15, 0.95), c(0.05, 0.95, 0.05, 0.15)))
     screen(1)
     
     par(mar=c(1,10,0.25, 1)+0.1)
