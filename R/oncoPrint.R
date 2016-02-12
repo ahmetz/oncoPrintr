@@ -198,7 +198,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
   message("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
   
   mutation_alterations <- c("Mutation" ,  "Missense" , "Nonsense" , "Splicing" ,  "Frameshift" ,  "Promoter" , "InFrame")
-  scna_alterations <- c("Amplification" , "Deletion" , "Present" , "NotPresent" , "NotTested", "homodel" , "del" , "CNLOH" , "LOH", "Yes" , "No", "Unknown")
+  scna_alterations <- c("Amplification" , "Deletion" , "homodel" , "del" , "CNLOH" , "LOH")
+  misc_alterations <- c("Present" , "NotPresent" , "NotTested", "Yes" , "No", "Unknown")
   fusion_alterations <- c("Fusion")
   border_alterations <- c("Pathogenic")
   
@@ -216,14 +217,14 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
         #browser()
         
         if(!is.na(altered)){ # there is an alteration
-          if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
+          if(grepl("," ,altered)){ # alteration is a mix of multiple seperated by a comma
             alts <- unlist(str_split(altered, ",")) # split the alterations
             for (altered in alts){
               if(altered %in% mutation_alterations) {
                 ytop2 <- ytop-0.25
                 ybottom2 <- ybottom+0.25
                 oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-              }else if( altered %in% scna_alterations){
+              }else if( altered %in% scna_alterations | altered %in% misc_alterations){
                 oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
               }else if(altered %in% fusion_alterations){
                 ytop2 <- ytop-0.1
@@ -236,7 +237,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
               ytop2 <- ytop-0.25
               ybottom2 <- ybottom+0.25
               oncoCords[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered);
-            }else if( altered %in% scna_alterations){
+            }else if( altered %in% scna_alterations | altered %in% misc_alterations){
               oncoCords.scna[cnt, ] <- c(xleft, ybottom, xright, ytop, altered);
             }else if(altered %in% fusion_alterations){
               ytop2 <- ytop-0.1
@@ -397,9 +398,10 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     #add legend
     screen(2)
     par(mar=c(0,0,0,0))
-    legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations]), horiz = F, border = F, cex = 0.5, bty = "n" )
-    legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations]), horiz = F, border = F, cex = 0.5, bty = "n" )
-    legend(x = 0.9, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations]), horiz = F, border = F, cex = 0.5, bty = "n" )
+    legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" )
+    legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" )
+    legend(x = 0.75, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" )
+    legend(x = 0.9, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" )
     #legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation", "In-Frame mutation", "Promoter mutation"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
     #legend(x="bottomleft", c( "Amplification", "Deletion", "Present", "LOH" ,"CNLOH"), fill = c('blue', 'red', 'darkorchid2', 'darkkhaki', 'deepskyblue'), horiz=T, border = F, cex=0.9, bty = 'n')
     close.screen(all.screens = TRUE)
