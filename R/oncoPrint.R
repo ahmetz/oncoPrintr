@@ -329,17 +329,34 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
         }else{
           oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
         }
-        cnt <- cnt+1;
+        cnt <- cnt+1
       }
     }
   }
-  ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
+  cnt <- 1
   if(!is.null(categorical_data)){
-    oncoCords.catData <-  matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
+    ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
+    ncategory <- length(unique(categorical_data[, 2]))
+    oncoCords.catData <-  matrix( rep(0, nsamples * ncategory * 5), nrow= nsamples * ncategory)
     colnames(oncoCords.catData) <- c("xleft", "ybottom", "xright", "ytop", "altered")
-    for (c)
+    
+    for (j in 1:nsamples){
+      for (i in 1:ncategory){
+        sample <- colnames(alterations)[j]
+        category <- unique(categorical_data[, 2])[i]
+        altered <- categorical_data[categorical_data[, 1] == sample & categorical_data[, 2] == category, 3]
+        xleft <- j-1 + xpadding 
+        ybottom <- ystart + ((ncategory-i+1) -1) + ypadding
+        xright <- j - xpadding 
+        ytop <- ystart + (ncategory-i+1) -ypadding
+        oncoCords.catData[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
+        cnt <- cnt + 1
+      }
+    }
+    oncoCords.base <- rbind(oncoCords.catData, oncoCords.base)
     
   }
+  
   
   
   ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
@@ -348,9 +365,9 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     colnames(oncoCords.contData) <- c("xleft", "ybottom", "xright", "ytop", "altered")
   }
   
-  labels = rownames(alterations)
   gene_prcnt <- list()
   if(!is.null(total_samples)){
+    
     labels=list()
     for(i in (1:nrow(alterations))){
       gene = row.names(alterations)[i]
@@ -359,45 +376,39 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       gene_prcnt[gene] <- prcnt
       labels = c(labels, paste(gene, "  ",round(prcnt,1), "%", sep=""))
     }
+  }else{
+    labels = rownames(alterations)
   }
   
+  if (!is.null(categorical_data)){
+    labels <- c(unique(categorical_data[, 2]), labels)
+  }
   barplot_data <- barplot_data[, match(rownames(alterations), colnames(barplot_data))]
   
   
   ## Set up color schema for different classes of alterations
-  cnt <- nsamples*ngenes
+  cnt <- nrow(oncoCords.base)
   colors <- rep(NA, cnt)
   colors.scna <- rep(NA, cnt)
   colors.fusion <- rep(NA, cnt)
-  colors[ which(oncoCords[, "altered"] == "Mutation") ] <- onco_colors[["Mutation"]]
-  colors[ which(oncoCords[, "altered"] == "Missense") ] <- onco_colors[["Missense"]]
-  colors[ which(oncoCords[, "altered"] == "Nonsense") ] <- onco_colors[["Nonsense"]]
-  colors[ which(oncoCords[, "altered"] == "Splicing") ] <- onco_colors[["Splicing"]]
-  colors[ which(oncoCords[, "altered"] == "Frameshift") ] <- onco_colors[["Frameshift"]]
-  colors[ which(oncoCords[, "altered"] == "Promoter") ] <- onco_colors[["Promoter"]]
-  colors[ which(oncoCords[, "altered"] == "InFrame") ] <- onco_colors[["InFrame"]]
-  colors[ which(oncoCords[, "altered"] == "Present") ] <- onco_colors[["Present"]]
-
+  colors.cat <- rep(NA, cnt)
+  for (alteration in mutation_alterations){
+    colors[ which(oncoCords[, "altered"] == alteration) ] <- onco_colors[[alteration]]
+  }
   
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Present") ] <- onco_colors[["Present"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "NotPresent") ] <- onco_colors[["NotPresent"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "NotTested") ] <- onco_colors[["NotTested"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "del") ] <- onco_colors[["del"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "LOH") ] <- onco_colors[["LOH"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "homodel") ] <- onco_colors[["homodel"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "CNLOH") ] <- onco_colors[["CNLOH"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Amplification") ] <- onco_colors[["Amplification"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Deletion") ] <- onco_colors[["Deletion"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Yes") ] <- onco_colors[["Yes"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "No") ] <- onco_colors[["No"]]
-  colors.scna[ which(oncoCords.scna[, "altered"] == "Unknown") ] <- onco_colors[["Unknown"]]
+  for (alteration in scna_alterations){
+    colors.scna[ which(oncoCords.scna[, "altered"] == alteration) ] <- onco_colors[[alteration]]
+  }
   
+  if(!is.null(categorical_data)){
+    for (alteration in misc_alterations){
+      colors.cat[ which(oncoCords.catData[, "altered"] == alteration) ] <- onco_colors[[alteration]]
+    }
+    
+  }
   colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- onco_colors[["Fusion"]]
   
   c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
-  
-  
-  
  
   #change the 
   def.par <- par(no.readonly = TRUE)
@@ -433,7 +444,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
     
-    axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
+    axis(2, at=(length(labels):1)-.5, labels=labels, las=2, lwd = 0);
     
     
     #add legend
@@ -454,13 +465,15 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
     rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
-    
-    axis(2, at=(ngenes:1)-.5, labels=labels, las=2, lwd = 0);
+    if(!is.null(categorical_data)){
+      rect(oncoCords.catData[, "xleft"], oncoCords.catData[, "ybottom"],oncoCords.catData[, "xright"], oncoCords.catData[, "ytop"], col=colors.cat, border=NA);
+    }
+    axis(2, at=(length(labels):1)-.5, labels=labels, las=2, lwd = 0);
     #printing samples or not
     if(printSamples){
       text((1:nsamples)-.5, par("usr")[3]+.3,srt=45, adj = 1,  labels = colnames(alterations), xpd=T, cex = 0.6)
     }
-    legend(x = 0, y = -2, names(onco_colors), fill = unlist(onco_colors), horiz = T, border = F, cex = 0.9, bty = "n" )
+    
     #add legend
     screen(2)
     par(mar=c(0,0,0,0))
@@ -486,6 +499,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   res$gene_prcnt <- gene_prcnt
   res$alterations.value <- alterations.c
   res$barplot_data <- barplot_data
+  res$oncoCords <- oncoCords.base
   res
 }
 

@@ -10,7 +10,9 @@
 #'
 #' @examples TODO2
 sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_order = NULL) {
-
+  if (length(setdiff(geneOrder, row.names(M))) > 1 ){
+    stop("List of genes entered do not match the list of genes in the data set")
+  }
   M <- M[geneOrder, ]
   if(!is.null(annotations)){
     colnames(annotations) <- c("sample", "class")
