@@ -22,7 +22,7 @@ sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_
     rownames(M2) <- rownames(M)
     M2 <- M2[ , drop=F]
     for(class in annotation_order){
-      if(! class %in% annotations){
+      if(!class %in% unique(annotations[, 2])){
         message("An annotation supplied in the annotation order does not exist in the annotation matrix! ")
         stop()
       }

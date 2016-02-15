@@ -268,6 +268,8 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
                 ybottom2 <- ybottom+0.1
                 oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
                 barplot_data["Fusion", gene] <- barplot_data["Fusion", gene] + 1
+              }else if(altered %in% border_alterations){
+                oncoCords.borders[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
               }
             }
           }else{ # alteration does not have a comma
@@ -286,6 +288,8 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
               ybottom2 <- ybottom+0.1
               oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
               barplot_data["Fusion", gene] <- barplot_data["Fusion", gene] + 1
+            }else if(altered %in% border_alterations){
+              oncoCords.borders[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
             }
           }
           
@@ -323,6 +327,8 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
             ybottom2 <- ybottom+0.1
             oncoCords.fusion[cnt, ] <- c(xleft, ybottom2, xright, ytop2, altered)
             barplot_data["Fusion", gene] <- barplot_data["Fusion", gene] + 1
+          }else if(altered %in% border_alterations){
+            oncoCords.borders[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
           }else{
             oncoCords[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
           }
@@ -392,12 +398,17 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   colors.scna <- rep(NA, cnt)
   colors.fusion <- rep(NA, cnt)
   colors.cat <- rep(NA, cnt)
+  colors.border <- rep(NA, cnt)
   for (alteration in mutation_alterations){
     colors[ which(oncoCords[, "altered"] == alteration) ] <- onco_colors[[alteration]]
   }
   
   for (alteration in scna_alterations){
     colors.scna[ which(oncoCords.scna[, "altered"] == alteration) ] <- onco_colors[[alteration]]
+  }
+  
+  for (alteration in border_alterations){
+    colors.border[ which(oncoCords.borders[, "altered"] == alteration) ] <- onco_colors[[alteration]]
   }
   
   if(!is.null(categorical_data)){
@@ -442,8 +453,11 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
-    rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
-    
+    rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA)
+    rect(oncoCords.borders[, "xleft"], oncoCords.borders[, "ybottom"],oncoCords.borders[, "xright"], oncoCords.borders[, "ytop"], col=NA, border="black")
+    if(!is.null(categorical_data)){
+      rect(oncoCords.catData[, "xleft"], oncoCords.catData[, "ybottom"],oncoCords.catData[, "xright"], oncoCords.catData[, "ytop"], col=colors.cat, border=NA);
+    }
     axis(2, at=(length(labels):1)-.5, labels=labels, las=2, lwd = 0);
     
     
@@ -464,7 +478,8 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
     rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
-    rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA);
+    rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA)
+    rect(oncoCords.borders[, "xleft"], oncoCords.borders[, "ybottom"],oncoCords.borders[, "xright"], oncoCords.borders[, "ytop"], col=NA, border="black")
     if(!is.null(categorical_data)){
       rect(oncoCords.catData[, "xleft"], oncoCords.catData[, "ybottom"],oncoCords.catData[, "xright"], oncoCords.catData[, "ytop"], col=colors.cat, border=NA);
     }
