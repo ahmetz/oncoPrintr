@@ -2,15 +2,13 @@
 #' 
 #' This function creates onco prints of genomic data based on mutations, copy number alterations, fusions, and other user defined categories. For each category 3 fields are required : Sample ID, Gene, and Variant Class. There are options to display binary events as well as continous variables. 
 #'
-#' @param df  this is the dataframe used to plot oncoprints. required colnames: Sample, Gene, VarClass
+#' @param data  A list of dataframes to be included in the oncoprint. For each data frame required columns are: Sample, Gene, Variant Type
 #' @param sort Boelean indicating whether genes should be sorted or now (default: True)
 #' @param convert Boelean indicating whether varclasses should be converted to more standard names (default: True)
 #' @param total_samples Total number of samples. If not given, total row numbers of input will be used
 #' @param geneName If given, genes are not automatically sorted. Instead this variable is used for sorting. Partial list of genes can be input
 #' @param annotations If given, these will be used for creating sub-groups of samples. Clustering will happen within annotatoion groups and then merged
 #' @param annotation_order This is the order of annotation categories to display. Required if annotations are given
-#' @param merge_scnas Bolean indicating whether to plot scnas and mutations together superimposed (default: False)
-#' @param df2 If multiple classes of alterations or clinical data points are to be merged, input your list of dataframes here. 
 #' @param alteration_score this list determines the relative importance of different genomic alterations. Amplification > Deletion > Mutations etc.
 #' @param printSamples Bolean indicating whether sample names should be printed under the oncoprint
 #' @param xpadding numerical value of the padding between two consecutive data columns
@@ -25,12 +23,33 @@
 #' @import grid
 #' @import stringr
 
-oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneName = NULL, annotation = NULL, annotation_order = NULL, merge_scnas = F, df2 = NULL, onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#A05E35", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", del = "red", LOH = "darkkhaki", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", Fusion =  "#D38C1F"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = T, xpadding = 0.1, ypadding = 0.1) {
+oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NULL, geneName = NULL, annotation = NULL, annotation_order = NULL, continuous_data = NULL, categorical_data = NULL, onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#A05E35", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", del = "red", LOH = "darkkhaki", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", Fusion =  "#D38C1F"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = F, xpadding = 0.1, ypadding = 0.1) {
+  # The function here started with the gist from Arman Aksoy here https://gist.github.com/armish/564a65ab874a770e2c26 and developped into this
+  
+  
   # This is the plotting function
   require(reshape2)
   require(dplyr)
   
+  if (is.data.frame(data)){
+    merge_scnas = F
+    df = data
+    df2 = NULL
+  }else{
+    if (length(data) == 1) {
+      merge_scnas = F
+      df2 = NULL
+      df = data[[1]]
+    }else{
+      merge_scnas = T
+      df = data[[1]]
+      df2 = data[2:length(data)]
+    }
+  }
   colnames(df) <- c("Sample", "Gene", "VarClass")
+  df$Sample <- as.character(df$Sample)
+  df$Gene <- as.character(df$Gene)
+  df$VarClass <- as.character(df$VarClass)
   
   # check if there are any samples with no alterations. If so, remove them to add later on. 
   # These will have VarClass = "None"
@@ -45,7 +64,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
   }
   
   #remove duplicates of gene events within the same sample.
-  #TO-DO do not remove if a gene has both a copy number alteration and a mutation
+  
   cat("Preparing input files\n")
   cat("Dim of df pre-process: ", dim(df), "\n")
   df <- remove_duplicates(df)
@@ -63,6 +82,9 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     for (dframe in df2){
       cat("Preparing additional data frames for input\n")
       colnames(dframe) <- c("Sample", "Gene", "VarClass")
+      df$Sample <- as.character(df$Sample)
+      df$Gene <- as.character(df$Gene)
+      df$VarClass <- as.character(df$VarClass)
       if(convert){
         cat("Dimensions of df to convert : ", dim(dframe), "\n")
         dframe <- convert_varclass(dframe)
@@ -76,6 +98,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
       cat("Merged Matrix:\n")
       
     }
+    
     cat("Finished additional data frames for input\n")
     alterations <- alts
     colnames(annotation) <- c("sample", "class")
@@ -107,6 +130,9 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
     alts <- acast(df, Gene ~ Sample)
     for (dframe in df2){
       colnames(dframe) <- c("Sample", "Gene", "VarClass")
+      df$Sample <- as.character(df$Sample)
+      df$Gene <- as.character(df$Gene)
+      df$VarClass <- as.character(df$VarClass)
       if(convert){
         dframe <- convert_varclass(dframe)
       }
@@ -131,7 +157,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
       
       if(!is.na(altered)){ # there is an alteration
         if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
-          alts <- unlist(str_split(altered, ",")) # split the alterations
+          alts <- unlist(stringr::str_split(altered, ",")) # split the alterations
           alterations.c[i, j] <- 0
           for (alt in alts){
             alterations.c[i, j] <- alterations.c[i, j] + alteration_score[[alt]]
@@ -195,6 +221,7 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
   xpadding <- xpadding
   ypadding <- ypadding
   cnt <- 1;
+  
   
   message("nsamples: ", nsamples, " ngenes: ", ngenes, "\n")
   
@@ -306,6 +333,20 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
       }
     }
   }
+  ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
+  if(!is.null(categorical_data)){
+    oncoCords.catData <-  matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
+    colnames(oncoCords.catData) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+    for (c)
+    
+  }
+  
+  
+  ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
+  if(!is.null(continuous_data)){
+    oncoCords.contData <-  matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
+    colnames(oncoCords.contData) <- c("xleft", "ybottom", "xright", "ytop", "altered")
+  }
   
   labels = rownames(alterations)
   gene_prcnt <- list()
@@ -354,6 +395,8 @@ oncoPrint <- function(df, sort=TRUE, convert = TRUE, total_samples = NULL, geneN
   colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- onco_colors[["Fusion"]]
   
   c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
+  
+  
   
  
   #change the 
