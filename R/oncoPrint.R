@@ -178,16 +178,17 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     geneName <- row.names(alterations)
   }
   
-  alterations.c <- sampleSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
-  
+  message("genes: ", geneName, " genes in matrix: ", row.names(alterations))
   if(length(setdiff(geneName, row.names(alterations) > 0))){
     genes <- setdiff(geneName, row.names(alterations))
     empty_rows <- matrix(rep(NA, length(genes)*ncol(alterations)), nrow = length(genes))
+    empty_rows.c <- matrix(rep(NA, length(genes)*ncol(alterations)), nrow = length(genes))
     row.names(empty_rows) <- genes
     message("missing genes: ", genes, "matrix dim: ", ncol(empty_rows), "-", nrow(empty_rows))
     alterations <- rbind(alterations, empty_rows)
+    alterations.c <- rbind(alterations.c, empty_rows)
   }
-  
+  alterations.c <- sampleSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
   alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
   
   ngenes <- nrow(alterations);

@@ -38,6 +38,8 @@
           return(x[grep("Yes", x[i]) ])
         }else if(grepl("No", x[i])){
           return(x[grep("No", x[i]) ])
+        }else if(grepl("Pathogenic", x[i])){
+          return(x[grep("Pathogenic", x[i]) ])
         }else if(grepl("IntragenicDeletion", x[i])){
           return(x[grep("IntragenicDeletion", x[i]) ])
         }else{
