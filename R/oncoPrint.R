@@ -181,11 +181,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   a$genename <- geneName
   a$genes <- row.names(alterations)
   a
-<<<<<<< HEAD
 }
-=======
-
->>>>>>> 565a149ab16740416809016f1546b146a70a62be
   message("genes: ", geneName, " genes in matrix: ", row.names(alterations))
   if(length(setdiff(geneName, row.names(alterations) > 0))){
     genes <- setdiff(geneName, row.names(alterations))
