@@ -23,7 +23,7 @@
 #' @import grid
 #' @import stringr
 
-oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NULL, geneName = NULL, annotation = NULL, annotation_order = NULL, continuous_data = NULL, categorical_data = NULL, onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#A05E35", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", del = "red", LOH = "darkkhaki", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", Fusion =  "#D38C1F"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = F, xpadding = 0.1, ypadding = 0.1) {
+oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NULL, geneName = NULL, annotation = NULL, annotation_order = NULL, continuous_data = NULL, categorical_data = NULL, onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#A05E35", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", del = "red", LOH = "#D17878", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", Fusion =  "#D38C1F", Pathogenic="white"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Pathogenic = 3,  Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = F, xpadding = 0.1, ypadding = 0.1) {
   # The function here started with the gist from Arman Aksoy here https://gist.github.com/armish/564a65ab874a770e2c26 and developped into this
   
   
@@ -177,6 +177,12 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   if(is.null(geneName)){
     geneName <- row.names(alterations)
   }
+  if(length(setdiff(geneOrder, row.names(alterations) > 0))){
+    genes <- setdiff(geneOrder, row.names(alterations))
+    empty_rows <- matrix(rep(0, length(genes)*ncol(alterations)), nrow = length(genes))
+    row.names(empty_rows) <- genes
+    alterations <- rbind(alterations, empty_rows)
+  }
   alterations.c <- sampleSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
   alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
   
@@ -193,7 +199,10 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   
   # check the total_samples variable. If there is a value given, make sure the # of samples match that
   nsamples <- ncol(alterations)
-  if(!is.null(total_samples)){
+  
+  if(!is.null(total_samples) & !is.null(categorical_data)){
+    
+    
     if(total_samples != nsamples){
       diff <- total_samples - nsamples
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
@@ -339,6 +348,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       }
     }
   }
+  
   cnt <- 1
   if(!is.null(categorical_data)){
     ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
@@ -429,7 +439,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   if(bottommargin > 5){bottommargin <- 1}
   if(!is.null(annotation)){
     
-    split.screen(rbind(c(0.05, 0.95, 0.95, 0.99), c(0.05,0.95,0.15, 0.94), c(0.05, 0.95, 0.01, 0.15)))
+    split.screen(rbind(c(0.01, 0.85, 0.95, 0.99), c(0.01,0.85,0.15, 0.95), c(0.01, 0.85, 0.01, 0.15), c(0.85, 0.99, 0.15, 0.99), c(0.86, 0.99, 0.01, 0.15)))
     screen(1)
     par(mar=c(0,10,0, 0), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
@@ -464,9 +474,10 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     #add legend
     screen(3)
     par(mar=c(0,0,0,0))
-    legend(x="topleft", c("Missense", "Nonsense", "Truncating", "In-Frame", "Promoter"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
-    
-    legend(x="bottomleft", c("Amplification", "Deletion", "LOH", "Present"), fill = c( '#EA2E49', '#174D9D', 'darkkhaki', 'darkorchid2'), horiz=T, border = F, cex=0.9, bty = 'n', x.intersp = 0.5)
+    legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
+    legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
+    legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
+    legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
     close.screen(all.screens = TRUE)
     
   }else{
