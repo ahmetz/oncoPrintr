@@ -10,7 +10,11 @@
 #'
 #' @examples TODO2
 sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_order = NULL) {
+<<<<<<< HEAD
   if(length(setdiff(geneOrder, row.names(M) > 0))){
+=======
+  if(setdiff(geneOrder, row.names(M) > 0)){
+>>>>>>> c7945f7e70c3563f8a3bc3a7e2cad5c4aecaa1c8
     genes <- setdiff(geneOrder, row.names(M))
     empty_rows <- matrix(rep(0, length(genes)*ncol(M)), nrow = length(genes))
     row.names(empty_rows) <- genes
