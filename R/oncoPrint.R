@@ -177,8 +177,8 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   if(is.null(geneName)){
     geneName <- row.names(alterations)
   }
-  if(length(setdiff(geneOrder, row.names(alterations) > 0))){
-    genes <- setdiff(geneOrder, row.names(alterations))
+  if(length(setdiff(geneName, row.names(alterations) > 0))){
+    genes <- setdiff(geneName, row.names(alterations))
     empty_rows <- matrix(rep(0, length(genes)*ncol(alterations)), nrow = length(genes))
     row.names(empty_rows) <- genes
     alterations <- rbind(alterations, empty_rows)
