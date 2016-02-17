@@ -10,7 +10,6 @@
 #'
 #' @examples TODO2
 sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_order = NULL) {
-
   if(length(setdiff(geneOrder, row.names(M) > 0))){
     genes <- setdiff(geneOrder, row.names(M))
     empty_rows <- matrix(rep(0, length(genes)*ncol(M)), nrow = length(genes))
