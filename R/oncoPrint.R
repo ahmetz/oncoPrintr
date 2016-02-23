@@ -51,16 +51,6 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   df$Gene <- as.character(df$Gene)
   df$VarClass <- as.character(df$VarClass)
   
-  #adding data frame for sample total mutations/scna
-  mutnum_data <- matrix(rep(0,2*length(unique(df$Sample))), nrow =2)
-  colnames(mutnum_data) <- unique(df$Sample)
-  row.names(mutnum_data) <- c("Mutation","SCNA")
-  
-  for ( i in 1:length(colnames(mutnum_data))){
-    mutnum_data["Mutation",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% c("nonsynonymous_SNV","splicing","stopgain_SNV", "frameshift_deletion","frameshift_insertion","nonframeshift_deletion","nonframeshift_insertion" )))
-    mutnum_data["SCNA",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% c("Amplification", "Deletion")))
-  }
-  
   # check if there are any samples with no alterations. If so, remove them to add later on. 
   # These will have VarClass = "None"
   not_altered_sample_num <- NA
@@ -257,6 +247,22 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   barplot_data <- matrix(rep(0, 3*ngenes), nrow = 3)
   colnames(barplot_data) <- row.names(alterations)
   row.names(barplot_data) <- c("Mutation", "SCNA", "Fusion")
+  
+   #create empty matrix for categorical variables
+  emptyCat_data <- matrix(rep(0, 3*length(unique(categorical_data[, 2]))), nrow = 3)
+  colnames(emptyCat_data) <- unique(categorical_data[, 2])
+  barplot_data <- cbind(emptyCat_data, barplot_data)
+  
+  #adding data frame for sample total mutations/scna
+  mutnum_data <- matrix(rep(0,3*length(unique(df$Sample))), nrow =3)
+  colnames(mutnum_data) <- unique(df$Sample)
+  row.names(mutnum_data) <- c("Mutation","SCNA", "Fusion")
+  
+  for ( i in 1:length(colnames(mutnum_data))){
+    mutnum_data["Mutation",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% mutation_alterations))
+    mutnum_data["SCNA",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% scna_alterations))
+    mutnum_data["Fusion",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% fusion_alterations))
+  }
   
   if (merge_scnas){ 
     
@@ -495,17 +501,16 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     close.screen(all.screens = TRUE)
     
   }else{
-    split.screen(rbind(c(0.01,0.852,0.8, 0.99), #top bar
+  #recommend output to pdf with 10x5" dimensions i.e - pdf("test.pdf", width = 10, height = 5, paper="special")
+    split.screen(rbind(c(0.01,0.8525,0.78, 0.99), #top sample bar
                        c(0.01,0.85,0.15, 0.8), #onco
                        c(0.1, 0.85, 0.01, 0.2), #legend
-                       c(0.83, 0.99, 0.15, 0.8), #bar
+                       c(0.83, 0.99, 0.15, 0.8), # gene bar
                        c(0.84, 0.99, 0.01, 0.15))) #bar legend
-    screen(1)
-    par(mar=c(0.1,8.9,0.2,0))
-    barplot(mutnum_data, horiz = F, axisnames = F,col= c("#2986E2", "#F26529"),cex.names = 0.5, cex.axis = 0.5, yaxs = "i", border=NA)
+    
     screen(2)
    #bottom, left, top and right in lines of text
-    par(mar=c(1,10,0.25, 1)+0.1)
+   par(mar=c(1,10,-.1, 1)+0.1)
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F, xaxs = "i");
     rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
     rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
@@ -520,6 +525,12 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     if(printSamples){
       text((1:nsamples)-.5, par("usr")[2]+.3,srt=45, adj = 1,  labels = colnames(alterations), xpd=T)
     }
+    
+   screen(1)
+   par(mar=c(0,8.87,0.2,0))
+   # barplot(mutnum_data, horiz = F, axisnames = F, col="#619744", border="#7FAB68", cex.names = 0.5, cex.axis = 0.5, yaxs = "i")
+   barplot(mutnum_data, horiz = F, axisnames = F,col= c("#2986E2", "#F26529", "#619744"),cex.names = 0.5, cex.axis = 0.5, yaxs = "i", border=NA)
+   
     #add legend
     screen(3)
     par(mar=c(0,0,0,0))
@@ -530,7 +541,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     #legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation", "In-Frame mutation", "Promoter mutation"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
     #legend(x="bottomleft", c( "Amplification", "Deletion", "Present", "LOH" ,"CNLOH"), fill = c('blue', 'red', 'darkorchid2', 'darkkhaki', 'deepskyblue'), horiz=T, border = F, cex=0.9, bty = 'n')
     screen(4)
-    par(mar=c(1.8,0.25,1,0))
+    par(mar=c(1.75,0.1,0.65,1))
     barplot(barplot_data[, rev(colnames(barplot_data))], horiz = T, axisnames = F, col= c("#2986E2", "#F26529", "#619744"), border = "white", xlab = paste("Total Samples = ", total_samples, sep=""), cex.names = 0.5, cex.axis = 0.5, yaxs ="i")
     screen(5)
     par(mar=c(0,0,0,0))
