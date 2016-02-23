@@ -528,7 +528,6 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     
    screen(1)
    par(mar=c(0,8.87,0.2,0))
-   # barplot(mutnum_data, horiz = F, axisnames = F, col="#619744", border="#7FAB68", cex.names = 0.5, cex.axis = 0.5, yaxs = "i")
    barplot(mutnum_data, horiz = F, axisnames = F,col= c("#2986E2", "#F26529", "#619744"),cex.names = 0.5, cex.axis = 0.5, yaxs = "i", border=NA)
    
     #add legend
@@ -540,9 +539,11 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
     #legend(x="topleft", c("Missense mutation", "Nonsense mutation", "Truncating mutation", "In-Frame mutation", "Promoter mutation"), fill = c('#26A818', 'black',  '#A05E35', '#F26529', '#2986E2'), horiz=T, border = F, cex=0.9, bty = 'n')
     #legend(x="bottomleft", c( "Amplification", "Deletion", "Present", "LOH" ,"CNLOH"), fill = c('blue', 'red', 'darkorchid2', 'darkkhaki', 'deepskyblue'), horiz=T, border = F, cex=0.9, bty = 'n')
+   
     screen(4)
     par(mar=c(1.75,0.1,0.65,1))
     barplot(barplot_data[, rev(colnames(barplot_data))], horiz = T, axisnames = F, col= c("#2986E2", "#F26529", "#619744"), border = "white", xlab = paste("Total Samples = ", total_samples, sep=""), cex.names = 0.5, cex.axis = 0.5, yaxs ="i")
+   
     screen(5)
     par(mar=c(0,0,0,0))
     legend(x = 0, y = 1,c("Mutations", "SCNA", "Fusion"), fill = c("#2986E2", "#F26529", "#619744"), bty="n", cex=0.75)
