@@ -394,7 +394,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   }
   
   
-  
+  oncoCords.contData <- matrix()
   ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
   if(!is.null(continuous_data)){
     oncoCords.contData <-  matrix( rep(0, numOfOncos * 5), nrow=numOfOncos )
