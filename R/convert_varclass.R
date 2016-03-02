@@ -37,7 +37,7 @@ convert_varclass <- function(df){
     df[grep("upstream", df$VarClass), ]["VarClass"] <- "Promoter"
   }
   if(sum(grepl("IntragenicDeletion", df$VarClass) > 0)){
-    df[grep("IntragenicDeletion", df$VarClass), ]["VarClass"] <- "Frameshift"
+    df[grep("IntragenicDeletion", df$VarClass), ]["VarClass"] <- "Deletion"
   }
   
   cat("Finished converting variant classes\n")
