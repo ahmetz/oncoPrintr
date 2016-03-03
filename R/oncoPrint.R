@@ -396,14 +396,14 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       for (i in 1:ncategory){
         sample <- colnames(alterations)[j]
         category <- unique(categorical_data[, 2])[i]
-        message(sample)
-        message(category)
-        altered <- categorical_data[which(categorical_data$Sample == sample & categorical_data$Category == category), 3]
+        sample.idx <- which(categorical_data$Mnumber == sample)
+        cat.idx <- which(categorical_data$Gene == category)
+        idx <- intersect(cat.idx, sample.idx)
+        altered <- categorical_data[idx, 3]
         xleft <- j-1 + xpadding 
         ybottom <- ystart + ((ncategory-i+1) -1) + ypadding
         xright <- j - xpadding 
         ytop <- ystart + (ncategory-i+1) -ypadding
-        message(cnt, altered)
         oncoCords.catData[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
         cnt <- cnt + 1
       }
