@@ -386,6 +386,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   cnt <- 1
   oncoCords.catData <- matrix()
   if(!is.null(categorical_data)){
+    message("Processing categorical data")
     colnames(categorical_data) <- c("Sample", "Category", "Type")
     ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
     ncategory <- length(unique(categorical_data[, 2]))
@@ -409,7 +410,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       }
     }
     oncoCords.base <- rbind(oncoCords.catData, oncoCords.base)
-    
+    message("Finished processing categorical data")
   }
   
   
