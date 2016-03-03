@@ -389,7 +389,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       }
     }
   }
-  
+  message("Here")
   cnt <- 1
   oncoCords.catData <- matrix()
   if(!is.null(categorical_data)){
