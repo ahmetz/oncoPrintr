@@ -217,7 +217,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   
   # check the total_samples variable. If there is a value given, make sure the # of samples match that
   nsamples <- ncol(alterations)
-  
+  message("Checking sample counts")
   if(!is.null(total_samples)){
     if(total_samples != nsamples){
       diff <- total_samples - nsamples
@@ -236,7 +236,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       alterations.c <- cbind(alterations.c, mat)
     }
   }
-  
+  message("Finished checking sample counts")
   
   ### Set up the matrices that will hold the coordinates for the oncoprints for variety of alterations
   ngenes <- nrow(alterations)
