@@ -218,13 +218,20 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   # check the total_samples variable. If there is a value given, make sure the # of samples match that
   nsamples <- ncol(alterations)
   
-  if(!is.null(total_samples) & !is.null(categorical_data)){
-    
-    
+  if(!is.null(total_samples)){
     if(total_samples != nsamples){
       diff <- total_samples - nsamples
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
       colnames(mat) <- paste(rep("MockSample", diff), "_", 1:diff, sep="")
+      alterations <- cbind(alterations, mat)
+      alterations.c <- cbind(alterations.c, mat)
+    }
+  }
+  if(!is.null(categorical_data)){ 
+   if(nrow(categorical_data) != nsamples){
+      diff <- nrow(categorical_data) - nsamples
+      mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
+      colnames(mat) <- setdiff(categorical_data[, 1], colnames(alterations))
       alterations <- cbind(alterations, mat)
       alterations.c <- cbind(alterations.c, mat)
     }
@@ -387,6 +394,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   oncoCords.catData <- matrix()
   if(!is.null(categorical_data)){
     message("Processing categorical data")
+    
     colnames(categorical_data) <- c("Sample", "Category", "Type")
     ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
     ncategory <- length(unique(categorical_data[, 2]))
@@ -397,14 +405,15 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       for (i in 1:ncategory){
         sample <- colnames(alterations)[j]
         category <- unique(categorical_data[, 2])[i]
-        sample.idx <- which(categorical_data$Mnumber == sample)
-        cat.idx <- which(categorical_data$Gene == category)
+        sample.idx <- which(categorical_data[, 1] == sample)
+        cat.idx <- which(categorical_data[,2] == category)
         idx <- intersect(cat.idx, sample.idx)
         altered <- categorical_data[idx, 3]
         xleft <- j-1 + xpadding 
         ybottom <- ystart + ((ncategory-i+1) -1) + ypadding
         xright <- j - xpadding 
         ytop <- ystart + (ncategory-i+1) -ypadding
+        #message(cnt, " ", sample, " ", category, " ", sample.idx , " ", altered)
         oncoCords.catData[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
         cnt <- cnt + 1
       }
