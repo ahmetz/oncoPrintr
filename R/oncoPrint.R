@@ -232,7 +232,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
    if(nrow(categorical_data) != nsamples){
       diff <- nrow(categorical_data) - nsamples
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
-      colnames(mat) <- setdiff(categorical_data[, 1], colnames(alterations))
+      colnames(mat) <- setdiff(categorical_data[[1]], colnames(alterations))
       alterations <- cbind(alterations, mat)
       alterations.c <- cbind(alterations.c, mat)
     }
