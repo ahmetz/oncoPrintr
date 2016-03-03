@@ -386,6 +386,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   cnt <- 1
   oncoCords.catData <- matrix()
   if(!is.null(categorical_data)){
+    colnames(categorical_data) <- c("Sample", "Category", "Type")
     ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
     ncategory <- length(unique(categorical_data[, 2]))
     oncoCords.catData <-  matrix( rep(0, nsamples * ncategory * 5), nrow= nsamples * ncategory)
@@ -397,7 +398,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
         category <- unique(categorical_data[, 2])[i]
         message(sample)
         message(category)
-        altered <- categorical_data[which(categorical_data[, 1] == sample & categorical_data[, 2] == category), 3]
+        altered <- categorical_data[which(categorical_data$Sample == sample & categorical_data$Category == category), 3]
         xleft <- j-1 + xpadding 
         ybottom <- ystart + ((ncategory-i+1) -1) + ypadding
         xright <- j - xpadding 
