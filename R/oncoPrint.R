@@ -65,11 +65,8 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   }
   
   #remove duplicates of gene events within the same sample.
-  muts_in_data <- as.character()
-  scna_in_data <- as.character()
-  misc_in_data <- as.character()
-  fusion_in_data <- as.character()
-  
+  events_in_data <- as.character()
+ 
   cat("Preparing input files\n")
   cat("Dim of df pre-process: ", dim(df), "\n")
   df <- remove_duplicates(df)
@@ -77,14 +74,12 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   if (convert){
     df <- convert_varclass(df)
   }
-  muts_in_data <- c(muts_in_data, unique(df[, 3]))
-  scna_in_data <- c(scna_in_data, unique(df[, 3]))
-  misc_in_data <- c(misc_in_data, unique(df[, 3]))
-  fusion_in_data <- c(fusion_in_data, unique(df[, 3]))
+  events_in_data <- c(events_in_data, unique(df[, 3]))
+  
   
   cat("Finished preparing input files\n")
   cat("Dim of df after class conversion: ", dim(df), "\n")
-  # if there is an annotation data frame, then figure out how many samples there are with no mutations and add them to the alterations matrix
+ 
   if(merge_scnas && !is.null(annotation)){
     alts <- acast(df, Gene ~ Sample)
     cat("There are ", length(df2), "additional data frames to process\n")
@@ -92,21 +87,20 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     for (dframe in df2){
       cat("Preparing additional data frames for input\n")
       colnames(dframe) <- c("Sample", "Gene", "VarClass")
-      df$Sample <- as.character(df$Sample)
-      df$Gene <- as.character(df$Gene)
-      df$VarClass <- as.character(df$VarClass)
+      dframe$Sample <- as.character(dframe$Sample)
+      dframe$Gene <- as.character(dframe$Gene)
+      dframe$VarClass <- as.character(dframe$VarClass)
       if(convert){
         cat("Dimensions of df to convert : ", dim(dframe), "\n")
         dframe <- convert_varclass(dframe)
       }
-      muts_in_data <- c(muts_in_data, unique(df[, 3]))
-      scna_in_data <- c(scna_in_data, unique(df[, 3]))
-      misc_in_data <- c(misc_in_data, unique(df[, 3]))
-      fusion_in_data <- c(fusion_in_data, unique(df[, 3]))
+      
       if(merge_scnas){
         cat("Dimensions of df to merge : ", dim(dframe), "\n")
         dframe <- remove_duplicates(dframe)
       }
+      events_in_data <- c(events_in_data, unique(dframe[, 3]))
+      
       alts2 <- acast(dframe, Gene ~ Sample)
       alts <- paste.matrix(alts, alts2)
       cat("Merged Matrix:\n")
@@ -144,15 +138,16 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     alts <- acast(df, Gene ~ Sample)
     for (dframe in df2){
       colnames(dframe) <- c("Sample", "Gene", "VarClass")
-      df$Sample <- as.character(df$Sample)
-      df$Gene <- as.character(df$Gene)
-      df$VarClass <- as.character(df$VarClass)
+      dframe$Sample <- as.character(dframe$Sample)
+      dframe$Gene <- as.character(dframe$Gene)
+      dframe$VarClass <- as.character(dframe$VarClass)
       if(convert){
         dframe <- convert_varclass(dframe)
       }
       if(merge_scnas){
         dframe <- remove_duplicates(dframe)
       }
+      events_in_data <- c(events_in_data, unique(dframe[, 3]))
       alts2 <- acast(dframe, Gene ~ Sample)
       alts <- paste.matrix(alts, alts2)
     }
@@ -411,7 +406,6 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
         ybottom <- ystart + ((ncategory-i+1) -1) + ypadding
         xright <- j - xpadding 
         ytop <- ystart + (ncategory-i+1) -ypadding
-        message(cnt, " ", sample, " ", category, " ", sample.idx , " ", altered)
         oncoCords.catData[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
         cnt <- cnt + 1
       }
@@ -521,17 +515,17 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     #add legend
     screen(3)
     par(mar=c(0,0,0,0))
-    if(length(mutation_alterations[mutation_alterations %in% muts_in_data$VarClass]) > 0){
-      legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% muts_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% muts_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
+    if(length(mutation_alterations[mutation_alterations %in% events_in_data]) > 0){
+      legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
     }
-    if (length(scna_alterations[scna_alterations %in% scna_in_data$VarClass]) > 0){
-      legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% scna_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% scna_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
+    if (length(scna_alterations[scna_alterations %in% events_in_data]) > 0){
+      legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
     }
-    if(length(misc_alterations[misc_alterations %in% misc_in_data$VarClass])> 0){
-      legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% misc_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% misc_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
+    if(length(misc_alterations[misc_alterations %in% events_in_data])> 0){
+      legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
     }
-    if(length(fusion_alterations[fusion_alterations %in% fusion_in_data$VarClass]) >0 ){
-      legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% fusion_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% fusion_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
+    if(length(fusion_alterations[fusion_alterations %in% events_in_data]) >0 ){
+      legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
     }
     close.screen(all.screens = TRUE)
     
@@ -563,24 +557,24 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     
    screen(1)
    par(mar=c(0,8.87,0.2,0))
-   barplot(mutnum_data, horiz = F, axisnames = F,col= c("#2986E2", "#F26529", "#619744"),cex.names = 0.5, cex.axis = 0.5, yaxs = "i", border=NA)
+   #barplot(mutnum_data, horiz = F, axisnames = F,col= c("#2986E2", "#F26529", "#619744"),cex.names = 0.5, cex.axis = 0.5, yaxs = "i", border=NA)
    
     #add legend
     screen(3)
     par(mar=c(0,0,0,0))
     
-
-    if(length(mutation_alterations[mutation_alterations %in% muts_in_data$VarClass]) > 0){
-      legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% muts_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% muts_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
+    events_in_data <- unlist(events_in_data)
+    if(length(mutation_alterations[mutation_alterations %in% events_in_data]) > 0){
+      legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
     }
-    if (length(scna_alterations[scna_alterations %in% scna_in_data$VarClass]) > 0){
-    legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% scna_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% scna_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
+    if (length(scna_alterations[scna_alterations %in% events_in_data]) > 0){
+    legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
     }
-    if(length(misc_alterations[misc_alterations %in% misc_in_data$VarClass])> 0){
-      legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% misc_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% misc_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
+    if(length(misc_alterations[misc_alterations %in% events_in_data])> 0){
+      legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
     }
-    if(length(fusion_alterations[fusion_alterations %in% fusion_in_data$VarClass]) >0 ){
-      legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% fusion_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% fusion_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
+    if(length(fusion_alterations[fusion_alterations %in% events_in_data]) >0 ){
+      legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
     }
   
       screen(4)
@@ -603,6 +597,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   res$sample_barplot_data <- mutnum_data
   res$oncoCords <- oncoCords.base
   res$catData <-  oncoCords.catData
+  res$events <- events_in_data
   res
 }
 
