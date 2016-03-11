@@ -398,9 +398,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       for (i in 1:ncategory){
         sample <- colnames(alterations)[j]
         category <- unique(categorical_data[, 2])[i]
-        sample.idx <- which(categorical_data[[1]] == sample)
-        cat.idx <- which(categorical_data[[2]] == category)
-        idx <- intersect(cat.idx, sample.idx)
+        idx <- which(categorical_data[[2]] == category & categorical_data[[1]] == sample)
         altered <- categorical_data[[3]][idx]
         xleft <- j-1 + xpadding 
         ybottom <- ystart + ((ncategory-i+1) -1) + ypadding
