@@ -16,7 +16,7 @@
 #' @export 
 #'
 #' @examples TODO
-convert_varclass <- function(df, class_lookup= c('splicing'="Splicing", 'stop'="Nonsense", 'nonsynonymous'="Missense", 'nonframeshift'="InFrame", 'frameshift'="Frameshift", 'upstream'="Promoter", 'IntragenicDeletion'="Deletion"){
+convert_varclass <- function(df, class_lookup= c('splicing'="Splicing", 'stop'="Nonsense", 'nonsynonymous'="Missense", 'nonframeshift'="InFrame", 'frameshift'="Frameshift", 'upstream'="Promoter", 'IntragenicDeletion'="Deletion")){
   cat("Converting variant classes\n")
   if (sum(grepl("splicing", df$VarClass) > 0)){
     df[grep("splicing", df$VarClass), ]["VarClass"] <- class_lookup['splicing']
