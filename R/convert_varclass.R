@@ -27,11 +27,11 @@ convert_varclass <- function(df){
   if(sum(grepl("nonsynonymous", df$VarClass) > 0)){
     df[grep("nonsynonymous", df$VarClass), ]["VarClass"] <- "Missense"
   }
-  if(sum(grepl("frameshift", df$VarClass) > 0)){
-    df[grep("frameshift", df$VarClass), ]["VarClass"] <- "Frameshift"
-  }
   if(sum(grepl("nonframeshift", df$VarClass) > 0)){
     df[grep("nonframeshift", df$VarClass), ]["VarClass"] <- "InFrame"
+  }
+  if(sum(grepl("frameshift", df$VarClass) > 0)){
+    df[grep("frameshift", df$VarClass), ]["VarClass"] <- "Frameshift"
   }
   if(sum(grepl("upstream", df$VarClass) > 0)){
     df[grep("upstream", df$VarClass), ]["VarClass"] <- "Promoter"
