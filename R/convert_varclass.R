@@ -19,25 +19,25 @@
 convert_varclass <- function(df, class_lookup= c('splicing'="Splicing", 'stop'="Nonsense", 'nonsynonymous'="Missense", 'nonframeshift'="InFrame", 'frameshift'="Frameshift", 'upstream'="Promoter", 'IntragenicDeletion'="Deletion"){
   cat("Converting variant classes\n")
   if (sum(grepl("splicing", df$VarClass) > 0)){
-    df[grep("splicing", df$VarClass), ]["VarClass"] <- "Splicing"
+    df[grep("splicing", df$VarClass), ]["VarClass"] <- class_lookup['splicing']
   }
   if(sum(grepl("stop", df$VarClass) > 0)){
-    df[grep("stop", df$VarClass), ]["VarClass"] <- "Nonsense"
+    df[grep("stop", df$VarClass), ]["VarClass"] <- class_lookup['stop']
   }
   if(sum(grepl("nonsynonymous", df$VarClass) > 0)){
-    df[grep("nonsynonymous", df$VarClass), ]["VarClass"] <- "Missense"
+    df[grep("nonsynonymous", df$VarClass), ]["VarClass"] <- class_lookup['nonsynonymous']
   }
   if(sum(grepl("nonframeshift", df$VarClass) > 0)){
-    df[grep("nonframeshift", df$VarClass), ]["VarClass"] <- "InFrame"
+    df[grep("nonframeshift", df$VarClass), ]["VarClass"] <- class_lookup['nonframeshift']
   }
   if(sum(grepl("frameshift", df$VarClass) > 0)){
-    df[grep("frameshift", df$VarClass), ]["VarClass"] <- "Frameshift"
+    df[grep("frameshift", df$VarClass), ]["VarClass"] <- class_lookup['frameshift']
   }
   if(sum(grepl("upstream", df$VarClass) > 0)){
-    df[grep("upstream", df$VarClass), ]["VarClass"] <- "Promoter"
+    df[grep("upstream", df$VarClass), ]["VarClass"] <- class_lookup['upstream']
   }
   if(sum(grepl("IntragenicDeletion", df$VarClass) > 0)){
-    df[grep("IntragenicDeletion", df$VarClass), ]["VarClass"] <- "Deletion"
+    df[grep("IntragenicDeletion", df$VarClass), ]["VarClass"] <- class_lookup['IntragenicDeletion']
   }
   
   cat("Finished converting variant classes\n")
