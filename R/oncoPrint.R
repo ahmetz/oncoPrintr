@@ -23,7 +23,7 @@
 #' @import grid
 #' @import stringr
 
-oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NULL, geneName = NULL, annotation = NULL, annotation_order = NULL, continuous_data = NULL, categorical_data = NULL, onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#ffaa00", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", del = "red", LOH = "#D17878", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", Fusion =  "#D38C1F", Pathogenic="white"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Pathogenic = 3,  Nonsense = 2.8, Frameshift = 2.5, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = F, xpadding = 0.1, ypadding = 0.1) {
+oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NULL, geneName = NULL, annotation = NULL, annotation_order = NULL, continuous_data = NULL, categorical_data = NULL, categorical_data_colors = NULL, onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#ffaa00", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", del = "red", LOH = "#D17878", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", Fusion =  "#D38C1F", Pathogenic="white"), alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Pathogenic = 3,  Nonsense = 2.8, Frameshift = 2.6, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1), printSamples = F, xpadding = 0.1, ypadding = 0.1) {
   # The function here started with the gist from Arman Aksoy here https://gist.github.com/armish/564a65ab874a770e2c26 and developped into this
   
   
@@ -223,10 +223,10 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     }
   }
   if(!is.null(categorical_data)){ 
-   if(nrow(categorical_data) != nsamples){
-      diff <- nrow(categorical_data) - nsamples
+   if(length(unique(categorical_data[[1]])) != nsamples){
+      diff <- length(unique(categorical_data[[1]])) - nsamples
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
-      colnames(mat) <- setdiff(categorical_data[[1]], colnames(alterations))
+      colnames(mat) <- setdiff(unique(categorical_data[[1]]), colnames(alterations))
       alterations <- cbind(alterations, mat)
       alterations.c <- cbind(alterations.c, mat)
     }
@@ -387,7 +387,11 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
 
   cnt <- 1
   oncoCords.catData <- matrix()
-  if(!is.null(categorical_data)){
+  if(!is.null(categorical_data) & !is.null(categorical_data_colors)){
+    
+    if(length(categorical_data_colors) < length(unique(categorical_data[, 3]))){
+      warning("You don't have sufficient amount of colors.\n")
+    }
     message("Processing categorical data")
     ystart <- max(as.numeric(oncoCords.base[,4])) + ypadding
     ncategory <- length(unique(categorical_data[[2]]))
@@ -395,20 +399,24 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     colnames(oncoCords.catData) <- c("xleft", "ybottom", "xright", "ytop", "altered")
     
     for (j in 1:nsamples){
-      for (i in 1:ncategory){
+      for (i  in 1:length(unique(categorical_data[[2]]))){
         sample <- colnames(alterations)[j]
-        category <- unique(categorical_data[, 2])[i]
-        idx <- which(categorical_data[[2]] == category & categorical_data[[1]] == sample)
-        altered <- categorical_data[[3]][idx]
+        category <- unname(unlist(unique(categorical_data[, 2]))[i])
+        # idx <- which(categorical_data[[3]] == category & categorical_data[[1]] == sample)
+        # altered <- ifelse(categorical_data[[3]][idx], categorical_data[[3]][idx], NA)
+        altered <- unname(unlist(categorical_data[categorical_data[, 1] == sample & categorical_data[, 2] == category, ][, 3]))
         xleft <- j-1 + xpadding 
-        ybottom <- ystart + ((ncategory-i+1) -1) + ypadding
+        ybottom <- ystart + i-1 + ypadding
         xright <- j - xpadding 
-        ytop <- ystart + (ncategory-i+1) -ypadding
-        #message("cnt:", cnt, ", altered: ", altered, ", sample: ", sample, ", category: ", category, ", idx: ", idx, ", sample.idx: ", sample.idx, ", cat.idx: ", cat.idx)
+        ytop <- ystart + i - ypadding
+        
+        #message("cnt:", cnt, ", altered: ", altered, ", sample: ", sample, ", category: ", category) # ", idx: ", idx, ", sample.idx: ", idx, ", cat.idx: ", idx)  
         oncoCords.catData[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
+          
         cnt <- cnt + 1
+        }
       }
-    }
+    
     oncoCords.base <- rbind(oncoCords.catData, oncoCords.base)
     message("Finished processing categorical data")
   }
@@ -437,7 +445,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   }
   
   if (!is.null(categorical_data)){
-    labels <- c(unique(categorical_data[, 2]), labels)
+    labels <- c(rev(unname(unlist(unique(categorical_data[, 2])))), labels)
   }
   barplot_data <- barplot_data[, match(rownames(alterations), colnames(barplot_data))]
   
@@ -460,17 +468,31 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   for (alteration in border_alterations){
     colors.border[ which(oncoCords.borders[, "altered"] == alteration) ] <- onco_colors[[alteration]]
   }
-  
-  if(!is.null(categorical_data)){
-    for (alteration in misc_alterations){
-      colors.cat[ which(oncoCords.catData[, "altered"] == alteration) ] <- onco_colors[[alteration]]
-    }
+  c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
+  if(!is.null(categorical_data) & is.null(categorical_data_colors)){
     
+    for (i in 1:length(unname(unlist(unique(categorical_data[, 3])))) ) {
+      cat(i, "\n")
+      categorical_data_colors[unname(unlist(unique(categorical_data[, 3])))[i]] <- c48[i] 
+      message(categorical_data_colors)
+    }
+    for (alteration in unname(unlist(unique(categorical_data[, 3]))) ){
+      colors.cat[ which(oncoCords.catData[, "altered"] == alteration) ] <- unname(unlist(categorical_data_colors[[alteration]] ) )
+    }
   }
+  
+  if(!is.null(categorical_data) & !is.null(categorical_data_colors)){
+    
+    for (alteration in unname(unlist(unique(categorical_data[, 3]))) ){
+      colors.cat[ which(oncoCords.catData[, "altered"] == alteration) ] <- unname(unlist(categorical_data_colors[[alteration]]))
+    }
+  }
+  
   colors.fusion[ which(oncoCords.fusion[, "altered"] == "Fusion") ] <- onco_colors[["Fusion"]]
   
-  c48 <- c("#1d915c","#5395b4","#964a48","#2e3b42","#b14e72", "#402630","#f1592a","#81aa90","#f79a70","#b5ddc2","#8fcc8b","#9f1f63","#865444", "#a7a9ac","#d0e088","#7c885c","#d22628","#343822","#231f20","#f5ee31","#a99fce","#54525e","#b0accc","#5e5b73","#efcd9f", "#68705d", "#f8f391", "#faf7b6", "#c4be5d", "#764c29", "#c7ac74", "#8fa7aa", "#c8e7dd", "#766a4d", "#e3a291", "#5d777a", "#299c39", "#4055a5", "#b96bac", "#d97646", "#cebb2d", "#bf1e2e", "#d89028", "#85c440", "#36c1ce", "#574a9e")
-  ngenes <- nrow(alterations) + length(unique(categorical_data[, 2]))
+  
+  ngenes <- nrow(alterations) + length(unique(categorical_data[[2]]))
+  cat(ngenes)
   #change the 
   def.par <- par(no.readonly = TRUE)
   leftmargin = 1/nsamples*500 
@@ -567,22 +589,35 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
     }
     if (length(scna_alterations[scna_alterations %in% events_in_data]) > 0){
-    legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
+    legend(x = 0.15, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
     }
     if(length(misc_alterations[misc_alterations %in% events_in_data])> 0){
-      legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
+      legend(x = 0.3, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
     }
     if(length(fusion_alterations[fusion_alterations %in% events_in_data]) >0 ){
-      legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
+      legend(x = 0.45, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
+    }
+    if(!is.null(categorical_data)){
+      if(length(categorical_data_colors) <= 7){
+      legend(x = 0.6, y=1, names(categorical_data_colors), fill = unlist(categorical_data_colors), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Categorical Data")
+      }else if(length(categorical_data_colors) > 5 & length(categorical_data_colors) <= 10){
+        legend(x = 0.6, y=1, names(categorical_data_colors[1:5]), fill = unlist(categorical_data_colors[1:5]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Categorical Data")
+        legend(x = 0.75, y=1, names(categorical_data_colors[6:10]), fill = unlist(categorical_data_colors[6:10]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "")
+      }
+      else if(length(categorical_data_colors) > 10 ){
+        legend(x = 0.6, y=1, names(categorical_data_colors[1:5]), fill = unlist(categorical_data_colors[1:5]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Categorical Data")
+        legend(x = 0.75, y=1, names(categorical_data_colors[6:10]), fill = unlist(categorical_data_colors[6:10]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "")
+        legend(x = 0.9, y=1, names(categorical_data_colors[11:length(categorical_data_colors)]), fill = unlist(categorical_data_colors[11:length(categorical_data_colors)]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "")
+      }
     }
   
       screen(4)
-    par(mar=c(1.75,0.1,0.65,1))
-    barplot(barplot_data[, rev(colnames(barplot_data))], horiz = T, axisnames = F, col= c("#2986E2", "#F26529", "#619744"), border = "white", xlab = paste("Total Samples = ", total_samples, sep=""), cex.names = 0.5, cex.axis = 0.5, yaxs ="i")
+    par(mar=c(1.75,0.1,2.4,1))
+    barplot(barplot_data[, rev(colnames(barplot_data))], horiz = T, axisnames = F, col= c("#21600A", "#602C0A", "#619744"), border = "white", xlab = paste("Total Samples = ", total_samples, sep=""), cex.names = 0.5, cex.axis = 0.5, yaxs ="i")
    
     screen(5)
     par(mar=c(0,0,0,0))
-    legend(x = 0, y = 1,c("Mutations", "SCNA", "Fusion"), fill = c("#2986E2", "#F26529", "#619744"), bty="n", cex=0.75)
+    legend(x = 0, y = 1,c("Mutations", "SCNA", "Fusion"), fill = c("#21600A", "#602C0A", "#619744"), bty="n", cex=0.75)
     close.screen(all.screens = TRUE)
   }
   par(def.par) 

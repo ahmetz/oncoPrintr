@@ -2,7 +2,21 @@
     cat("Filtering duplicates\n")
     choose_alteration_type <- function(x){
       for (i in 1:length(x)){
-        if(grepl("stopgain", x[i])){
+        if(grepl("Frameshift", x[i])){
+          return(x[grep("Frameshift", x[i])])
+        }else if(grepl("InFrame", x[i])){
+          return(x[grep("InFrame", x[i])])
+        }else if(grepl("Missense", x[i])){
+          return(x[grep("Missense", x[i])])
+        }else if(grepl("Mutation", x[i])){
+          return(x[grep("Mutation", x[i])])
+        }else if(grepl("Nonsense", x[i])){
+          return(x[grep("Nonsense", x[i])])
+        }else if(grepl("Promoter", x[i])){
+          return(x[grep("Promoter", x[i])])
+        }else if(grepl("Splicing", x[i])){
+          return(x[grep("Splicing", x[i])])
+        }else if(grepl("stopgain", x[i])){
           return(x[grep("stopgain", x[i])])
         }else if(grepl("insertion", x[i])){
           return(x[grep("insertion", x[i])])
