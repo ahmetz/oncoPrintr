@@ -4,7 +4,9 @@
 \alias{convert_varclass}
 \title{convert_varclass}
 \usage{
-convert_varclass(df)
+convert_varclass(df, class_lookup = c(splicing = "Splicing", stop =
+  "Nonsense", nonsynonymous = "Missense", nonframeshift = "InFrame", frameshift
+  = "Frameshift", upstream = "Promoter", IntragenicDeletion = "Deletion"))
 }
 \arguments{
 \item{df}{dataframe of genomic alterations}
