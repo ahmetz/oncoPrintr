@@ -399,7 +399,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     ncategory <- length(unique(categorical_data[[2]]))
     oncoCords.catData <-  matrix( rep(0, nsamples * ncategory * 5), nrow= nsamples * ncategory)
     colnames(oncoCords.catData) <- c("xleft", "ybottom", "xright", "ytop", "altered")
-    cat_data <- unname(unlist(unique(categorical_data[, 2]))
+    cat_data <- unname(unlist(unique(categorical_data[, 2])))
                        if(!is.null(categorical_data_order)){
                          cat_data <- categorical_data_order
                        }
