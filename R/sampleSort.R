@@ -32,6 +32,7 @@ sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_
         sub_mat <- t(sub_mat.t)
         sub_mat <- sub_mat[, ncol(sub_mat):1]
         M2 <- cbind(M2, sub_mat)
+        message("class: ", class, "\n")
         cat(sub_mat)
       }
     }
