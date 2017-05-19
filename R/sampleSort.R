@@ -37,6 +37,8 @@ sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_
       }
     }
     M <- M2[, 2:ncol(M2)]
+    message("Final Matrix: \n")
+    cat(M)
     return(M)
   }else{
   M.t <- t(M)
