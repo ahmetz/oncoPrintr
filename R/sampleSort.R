@@ -13,7 +13,7 @@ sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_
   
   M <- M[geneOrder, ]
   if(!is.null(annotations)){
-    message("Annotations will be used for sorting. There are", length(annotation_order), " classes.\n")
+    message("Annotations will be used for sorting. There are ", length(annotation_order), " classes.\n")
     colnames(annotations) <- c("sample", "class")
     classes <- unique(annotations$class)
     M2 <- matrix(nrow=nrow(M))
@@ -35,7 +35,7 @@ sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_
       }
     }
     M <- M2[, 2:ncol(M2)]
-
+    cat(M)
     return(M)
   }else{
   M.t <- t(M)
