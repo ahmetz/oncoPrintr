@@ -32,10 +32,10 @@ sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_
         sub_mat <- t(sub_mat.t)
         sub_mat <- sub_mat[, ncol(sub_mat):1]
         M2 <- cbind(M2, sub_mat)
+        cat(sub_mat)
       }
     }
     M <- M2[, 2:ncol(M2)]
-    cat(M)
     return(M)
   }else{
   M.t <- t(M)
