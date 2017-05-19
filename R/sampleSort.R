@@ -13,14 +13,15 @@ sampleSort <- function(M, geneOrder = geneOrder, annotations = NULL, annotation_
   
   M <- M[geneOrder, ]
   if(!is.null(annotations)){
+    message("Annotations will be used for sorting. There are", length(annotation_order), " classes.\n")
     colnames(annotations) <- c("sample", "class")
     classes <- unique(annotations$class)
     M2 <- matrix(nrow=nrow(M))
     colnames(M2) <- "Drop"
     rownames(M2) <- rownames(M)
     M2 <- M2[ , drop=F]
+    
     for(class in annotation_order){
-
       samples <- annotations[which(annotations[, 2] == class), ][, 1]
       sub_mat <- M[, which(colnames(M)%in%samples$sample), drop=FALSE]
       if (ncol(sub_mat) == 1){
