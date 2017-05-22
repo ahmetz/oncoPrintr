@@ -406,7 +406,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
                          cat_data <- categorical_data_order
                        }
                        for (j in 1:nsamples){
-                         for (category  in cate_data){
+                         for (category  in cat_data){
                            sample <- colnames(alterations)[j]
                            # category <- cat_data[i]
                            # idx <- which(categorical_data[[3]] == category & categorical_data[[1]] == sample)
