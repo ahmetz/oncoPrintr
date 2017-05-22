@@ -513,7 +513,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     #                    c(0.85, 0.99, 0.15, 0.99), 
     #                    c(0.86, 0.99, 0.01, 0.15))
     #              )
-    
+    # 
     split.screen(rbind(c(0.01,0.8525,0.78, 0.99), #top sample bar
                        c(0.01,0.85,0.15, 0.8), #onco
                        c(0.1, 0.85, 0.01, 0.2), #legend
