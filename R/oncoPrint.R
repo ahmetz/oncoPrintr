@@ -508,12 +508,18 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   if(bottommargin > 5){bottommargin <- 1}
 
   #recommend output to pdf with 10x5" dimensions i.e - pdf("test.pdf", width = 10, height = 5, paper="special")
-  split.screen(rbind(c(0.01,0.8525,0.78, 0.99), #top sample bar
-                     c(0.01,0.85,0.15, 0.8), #onco
-                     c(0.1, 0.85, 0.01, 0.2), #legend
-                     c(0.83, 0.99, 0.15, 0.8), # gene bar
-                     c(0.84, 0.99, 0.01, 0.15))) #bar legend
+  split.screen(rbind(c(0.01, 0.85, 0.95, 0.99), 
+                      c(0.01,0.85,0.15, 0.95),
+                      c(0.01, 0.85, 0.01, 0.15),
+                      c(0.85, 0.99, 0.15, 0.99),
+                      c(0.86, 0.99, 0.01, 0.15)))
   
+  # split.screen(rbind(c(0.01,0.8525,0.78, 0.99), #top sample bar
+  #                    c(0.01,0.85,0.15, 0.8), #onco
+  #                    c(0.1, 0.85, 0.01, 0.2), #legend
+  #                    c(0.83, 0.99, 0.15, 0.8), # gene bar
+  #                    c(0.84, 0.99, 0.01, 0.15))) #bar legend
+  # 
   # screen(1)
   # par(mar=c(0,8.87,0.2,0))
   #barplot(mutnum_data, horiz = F, axisnames = F,col= c("#2986E2", "#F26529", "#619744"),cex.names = 0.5, cex.axis = 0.5, yaxs = "i", border=NA)
