@@ -507,8 +507,19 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   bottommargin = 1/ngenes*500
   if(bottommargin > 5){bottommargin <- 1}
   if(!is.null(annotation)){
+    # split.screen(rbind(c(0.01, 0.85, 0.95, 0.99), 
+    #                    c(0.01,0.85,0.15, 0.95), 
+    #                    c(0.01, 0.85, 0.01, 0.15), 
+    #                    c(0.85, 0.99, 0.15, 0.99), 
+    #                    c(0.86, 0.99, 0.01, 0.15))
+    #              )
     
-    split.screen(rbind(c(0.01, 0.85, 0.95, 0.99), c(0.01,0.85,0.15, 0.95), c(0.01, 0.85, 0.01, 0.15), c(0.85, 0.99, 0.15, 0.99), c(0.86, 0.99, 0.01, 0.15)))
+    split.screen(rbind(c(0.01,0.8525,0.78, 0.99), #top sample bar
+                       c(0.01,0.85,0.15, 0.8), #onco
+                       c(0.1, 0.85, 0.01, 0.2), #legend
+                       c(0.83, 0.99, 0.15, 0.8), # gene bar
+                       c(0.84, 0.99, 0.01, 0.15))) #bar legend
+    
     screen(1)
     par(mar=c(0,10,0, 0), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
@@ -525,7 +536,6 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     }
     text(x=axis.points, y = 0.5, labels = subtype.labels)
     
-    
     screen(2)
     par(mar=c(0,10,0,0), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
@@ -539,23 +549,35 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     }
     axis(2, at=(length(labels):1)-.5, labels=labels, las=2, lwd = 0);
     
-    
     #add legend
     screen(3)
-    par(mar=c(0,0,0,0))
+    events_in_data <- unlist(events_in_data)
     if(length(mutation_alterations[mutation_alterations %in% events_in_data]) > 0){
-      legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
+      legend(x = 0, y = 1, names(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Mutations")
     }
     if (length(scna_alterations[scna_alterations %in% events_in_data]) > 0){
-      legend(x = 0.25, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
+      legend(x = 0.15, y = 1, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "SCNA")
     }
     if(length(misc_alterations[misc_alterations %in% events_in_data])> 0){
-      legend(x = 0.5, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
+      legend(x = 0.3, y = 1, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Misc Fetatures")
     }
     if(length(fusion_alterations[fusion_alterations %in% events_in_data]) >0 ){
-      legend(x = 0.75, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data$VarClass]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data$VarClass]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
+      legend(x = 0.45, y=1, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Fusions")
     }
-    close.screen(all.screens = TRUE)
+    if(!is.null(categorical_data)){
+      if(length(categorical_data_colors) <= 7){
+        legend(x = 0.6, y=1, names(categorical_data_colors), fill = unlist(categorical_data_colors), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Categorical Data")
+      }else if(length(categorical_data_colors) > 5 & length(categorical_data_colors) <= 10){
+        legend(x = 0.6, y=1, names(categorical_data_colors[1:5]), fill = unlist(categorical_data_colors[1:5]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Categorical Data")
+        legend(x = 0.75, y=1, names(categorical_data_colors[6:10]), fill = unlist(categorical_data_colors[6:10]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "")
+      }
+      else if(length(categorical_data_colors) > 10 ){
+        legend(x = 0.6, y=1, names(categorical_data_colors[1:5]), fill = unlist(categorical_data_colors[1:5]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "Categorical Data")
+        legend(x = 0.75, y=1, names(categorical_data_colors[6:10]), fill = unlist(categorical_data_colors[6:10]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "")
+        legend(x = 0.9, y=1, names(categorical_data_colors[11:length(categorical_data_colors)]), fill = unlist(categorical_data_colors[11:length(categorical_data_colors)]), horiz = F, border = F, cex = 0.7, bty = "n" , title = "")
+      }
+    }
+    
     
   }else{
     #recommend output to pdf with 10x5" dimensions i.e - pdf("test.pdf", width = 10, height = 5, paper="special")
