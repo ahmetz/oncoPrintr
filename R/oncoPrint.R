@@ -520,7 +520,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   
   if(!is.null(annotation)){
     screen(1)
-    par(mar=c(0,10,0, 0), mgp=c(3, 0.7, 0))
+    par(mar=c(1,10,-.1, 1)+0.1)
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
     counts <- data.frame(table(annotation$class))
     xleft <- 0
