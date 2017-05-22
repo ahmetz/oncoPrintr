@@ -201,9 +201,10 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   alterations.c <- sampleSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
   message("dimensions of alterations.c")
     cat(dim(alterations.c))
+  cat(alterations.c[1:5, 1:5])
   message("dimensions of alterations")
   cat(dim(alterations))
-  
+    cat(alterations[1:5, 1:5])
   alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
   
 
