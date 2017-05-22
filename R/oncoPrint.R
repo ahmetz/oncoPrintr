@@ -520,7 +520,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   
   if(!is.null(annotation)){
     screen(1)
-    par(mar=c(1,10,-.1, 1)+0.1)
+    par(mar=c(0,10,0,0), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
     counts <- data.frame(table(annotation$class))
     xleft <- 0
@@ -539,7 +539,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   
   screen(2)
   #bottom, left, top and right in lines of text
-  par(mar=c(1,10,-.1, 1)+0.1)
+  par(mar=c(0,10,0,0), mgp=c(3, 0.7, 0))
   plot(c(0, nsamples), c(0, ngenes), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F, xaxs = "i");
   rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
   rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
