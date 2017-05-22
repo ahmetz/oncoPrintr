@@ -402,30 +402,30 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     oncoCords.catData <-  matrix( rep(0, nsamples * ncategory * 5), nrow= nsamples * ncategory)
     colnames(oncoCords.catData) <- c("xleft", "ybottom", "xright", "ytop", "altered")
     cat_data <- unname(unlist(unique(categorical_data[, 2])))
-                       if(!is.null(categorical_data_order)){
-                         cat_data <- categorical_data_order
-                       }
-                       for (j in 1:nsamples){
-                         for (category  in cat_data){
-                           sample <- colnames(alterations)[j]
-                           # category <- cat_data[i]
-                           # idx <- which(categorical_data[[3]] == category & categorical_data[[1]] == sample)
-                           # altered <- ifelse(categorical_data[[3]][idx], categorical_data[[3]][idx], NA)
-                           altered <- unname(unlist(categorical_data[categorical_data[, 1] == sample & categorical_data[, 2] == category, ][, 3]))
-                           xleft <- j-1 + xpadding 
-                           ybottom <- ystart + i-1 + ypadding
-                           xright <- j - xpadding 
-                           ytop <- ystart + i - ypadding
-                           
-                           message("cnt:", cnt, ", altered: ", altered, ", sample: ", sample, ", category: ", category) # ", idx: ", idx, ", sample.idx: ", idx, ", cat.idx: ", idx)  
-                           oncoCords.catData[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
-                           
-                           cnt <- cnt + 1
-                         }
-                       }
-                       
-                       oncoCords.base <- rbind(oncoCords.catData, oncoCords.base)
-                       message("Finished processing categorical data")
+    if(!is.null(categorical_data_order)){
+     cat_data <- categorical_data_order
+    }
+    for (j in 1:nsamples){
+     for (category  in cat_data){
+       sample <- colnames(alterations)[j]
+       # category <- cat_data[i]
+       # idx <- which(categorical_data[[3]] == category & categorical_data[[1]] == sample)
+       # altered <- ifelse(categorical_data[[3]][idx], categorical_data[[3]][idx], NA)
+       altered <- unname(unlist(categorical_data[categorical_data[, 1] == sample & categorical_data[, 2] == category, ][, 3]))
+       xleft <- j-1 + xpadding 
+       ybottom <- ystart + i-1 + ypadding
+       xright <- j - xpadding 
+       ytop <- ystart + i - ypadding
+       
+       #message("cnt:", cnt, ", altered: ", altered, ", sample: ", sample, ", category: ", category) # ", idx: ", idx, ", sample.idx: ", idx, ", cat.idx: ", idx)  
+       oncoCords.catData[cnt, ] <- c(xleft, ybottom, xright, ytop, altered)
+       
+       cnt <- cnt + 1
+     }
+    }
+    
+    oncoCords.base <- rbind(oncoCords.catData, oncoCords.base)
+    message("Finished processing categorical data")
   }
   
   
