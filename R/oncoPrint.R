@@ -406,9 +406,9 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
                          cat_data <- categorical_data_order
                        }
                        for (j in 1:nsamples){
-                         for (i  in 1:length(cat_data)){
+                         for (category  in cate_data){
                            sample <- colnames(alterations)[j]
-                           category <- cat_data[i]
+                           # category <- cat_data[i]
                            # idx <- which(categorical_data[[3]] == category & categorical_data[[1]] == sample)
                            # altered <- ifelse(categorical_data[[3]][idx], categorical_data[[3]][idx], NA)
                            altered <- unname(unlist(categorical_data[categorical_data[, 1] == sample & categorical_data[, 2] == category, ][, 3]))
