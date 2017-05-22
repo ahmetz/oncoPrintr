@@ -199,7 +199,14 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     alterations.c <- rbind(alterations.c, empty_rows)
   }
   alterations.c <- sampleSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
+  message("dimensions of alterations.c")
+    cat(dim(alterations.c))
+  message("dimensions of alterations")
+  cat(dim(alterations))
+  
   alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
+  
+
   
   ngenes <- nrow(alterations);
   nsamples <- ncol(alterations);
