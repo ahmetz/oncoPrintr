@@ -206,6 +206,10 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   message("dimensions of alterations")
   cat(dim(alterations), "\n")
     cat(alterations[1:5, 1:5], "\n")
+  res <- list()
+  res$sortedMatrix <- alterations
+  res$valueMatrix <- alterations.c
+  return(res)
   alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
   
 
