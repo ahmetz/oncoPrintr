@@ -536,7 +536,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       subtype.labels <- c(subtype.labels, annotation_order[i])
       xright <- counts[which(counts$Var1 == annotation_order[i]), ]['Freq']
       if(!is.null(annotation_colors)){
-        rect(xleft, 0, xleft + xright$Freq, 1, col = annotation_colors, border = "white")
+        rect(xleft, 0, xleft + xright$Freq, 1, col = annotation_colors[i], border = "white")
        }else{
         rect(xleft, 0, xleft + xright$Freq, 1, col = c48[i], border = "white")
        }
