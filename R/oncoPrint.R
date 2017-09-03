@@ -391,7 +391,8 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   
   cnt <- 1
   oncoCords.catData <- matrix()
-  
+  cat("here\n")
+            
   if(!is.null(categorical_data)){
     if(length(categorical_data_colors) < length(unique(categorical_data[, 3]))){
       warning("You don't have sufficient amount of colors.\n")
