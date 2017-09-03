@@ -232,7 +232,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       diff <- length(unique(categorical_data[[1]])) - nsamples
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
       cat("ncol=", diff, " ngenes=", ngenes, "\n")
-      cat(mat)
+      cat(setdiff(unique(categorical_data[[1]]), colnames(alterations)))
       colnames(mat) <- setdiff(unique(categorical_data[[1]]), colnames(alterations))
       alterations <- cbind(alterations, mat)
       alterations.c <- cbind(alterations.c, mat)
