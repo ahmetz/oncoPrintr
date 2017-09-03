@@ -283,7 +283,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     mutnum_data["SCNA",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% scna_alterations))
     mutnum_data["Fusion",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% fusion_alterations))
   }
-  
+    cat("here\n")
   if (merge_scnas){ 
     
     for(i in 1:ngenes) {
@@ -391,7 +391,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   
   cnt <- 1
   oncoCords.catData <- matrix()
-  cat("here\n")
+
             
   if(!is.null(categorical_data)){
     if(length(categorical_data_colors) < length(unique(categorical_data[, 3]))){
