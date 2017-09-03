@@ -229,7 +229,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   if(!is.null(categorical_data)){ 
 
     if(length(unique(categorical_data[[1]])) > nsamples){
-      diff <- length(unique(categorical_data[[1]])) - nsamples
+      diff <- length(setdiff(unique(categorical_data[[1]]), colnames(alterations)))
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
       cat("ncol=", diff, " ngenes=", ngenes, "\n")
       cat(setdiff(unique(categorical_data[[1]]), colnames(alterations)))
