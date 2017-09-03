@@ -227,6 +227,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     }
   }
   if(!is.null(categorical_data)){ 
+        cat("here\n")
     if(length(unique(categorical_data[[1]])) != nsamples){
       diff <- length(unique(categorical_data[[1]])) - nsamples
       mat <- matrix(data = rep(NA, ngenes*diff), ncol = diff, nrow = ngenes)
@@ -283,7 +284,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     mutnum_data["SCNA",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% scna_alterations))
     mutnum_data["Fusion",i] = length(which(df$Sample==colnames(mutnum_data)[i] & df$VarClass %in% fusion_alterations))
   }
-    cat("here\n")
+
   if (merge_scnas){ 
     
     for(i in 1:ngenes) {
