@@ -525,19 +525,20 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   )
   )
   
-  for(i in 1:6) {
-    screen(i)
-    par(mar = c(0, 0, 0, 0))
-    plot(1:2, axes = FALSE, type = "n")
-    text(1.5, 1.5, i)
-    box()
-    }
-  
+  # for(i in 1:6) {
+  #   screen(i)
+  #   par(mar = c(0, 0, 0, 0))
+  #   plot(1:2, axes = FALSE, type = "n")
+  #   text(1.5, 1.5, i)
+  #   box()
+  #   }
+  # 
   
   if(!is.null(annotation)){
     screen(1)
 
-    par(mar=c(0,5,0,0), mgp=c(3, 0.7, 0))
+    par(mar=c(0,5,9,0), mgp=c(3, 0.7, 0))
+    box()
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
 
     counts <- data.frame(table(annotation$class))
