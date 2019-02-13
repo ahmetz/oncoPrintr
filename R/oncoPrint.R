@@ -524,7 +524,6 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
                      #c(0.85, 0.99, 0, 0.15)) #bar legend
   )
   )
-  
   # for(i in 1:6) {
   #   screen(i)
   #   par(mar = c(0, 0, 0, 0))
@@ -532,13 +531,12 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   #   text(1.5, 1.5, i)
   #   box()
   #   }
-  # 
+
   
   if(!is.null(annotation)){
     screen(1)
 
     par(mar=c(0,5,9,0), mgp=c(3, 0.7, 0))
-    box()
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
 
     counts <- data.frame(table(annotation$class))
@@ -588,13 +586,14 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   barplot(barplot_data[, rev(colnames(barplot_data))], horiz = T, axisnames = F, col= c("#424395", "#51B224", "#FF9700"), border = "white", yaxt ="n", cex.axis=0.7, tck=-.01)
   
   #add legend
+  
   screen(6)
   par(mar=c(0,0,0,0))
-  
+
   y.int <- 0.8
   x.int <- 0.5
   legend.cex = 1
-  
+  plot(1:2, axes = FALSE, type = "n")
   events_in_data <- unlist(events_in_data)
   if(length(mutation_alterations[mutation_alterations %in% events_in_data]) > 0){
     legend(x = 1, y = 2, names(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% mutation_alterations[mutation_alterations %in% events_in_data]]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Mutations", y.intersp = y.int, x.intersp = x.int)
@@ -621,12 +620,9 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
       legend(x = 0.9, y=1, names(categorical_data_colors[11:length(categorical_data_colors)]), fill = unlist(categorical_data_colors[11:length(categorical_data_colors)]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "", y.intersp = y.int, x.intersp = x.int)
     }
   }
-  legend(x = 1, y = 1.3,c("Mutations", "SCNA", "Fusion"), fill = c("#424395", "#51B224", "#FF9700"), bty="n", cex = legend.cex, border = F, title="", y.intersp = y.int, x.intersp = x.int)
-  
-  # screen(6)
-  # par(mar=c(0,0,0,0))
-  # 
-  # 
+
+    legend(x = 1, y = 1.3,c("Mutations", "SCNA", "Fusion"), fill = c("#424395", "#51B224", "#FF9700"), bty="n", cex = legend.cex, border = F, title="", y.intersp = y.int, x.intersp = x.int)
+
   close.screen(all.screens = TRUE)
 
   par(def.par) 
