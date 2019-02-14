@@ -530,12 +530,11 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   #   plot(1:2, axes = FALSE, type = "n")
   #   text(1.5, 1.5, i)
   #   box()
-  #   }
+  #   }asd
 
   
   if(!is.null(annotation)){
     screen(1)
-
     par(mar=c(0,5,9,0), mgp=c(3, 0.7, 0))
     plot(c(0, nsamples), c(0,1), type="n", main="", xlab="Samples", xaxt="n", ylab="", yaxt="n", frame.plot = F)
 
@@ -602,26 +601,26 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
     legend(x = 1.5, y = 2, names(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% scna_alterations[scna_alterations %in% events_in_data]]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "SCNA", y.intersp = y.int, x.intersp = x.int)
   }
   if(length(misc_alterations[misc_alterations %in% events_in_data])> 0){
-    legend(x =1.5, y = 1.5, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Misc Fetatures", y.intersp = y.int, x.intersp = x.int)
+    legend(x =1.5, y = 1.6, names(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% misc_alterations[misc_alterations %in% events_in_data]]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Misc Fetatures", y.intersp = y.int, x.intersp = x.int)
   }
   if(length(fusion_alterations[fusion_alterations %in% events_in_data]) >0 ){
-    legend(x = 1, y=1.5, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Fusions", y.intersp = y.int, x.intersp = x.int)
+    legend(x = 1, y=1.6, names(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), fill = unlist(onco_colors[names(onco_colors) %in% fusion_alterations[fusion_alterations %in% events_in_data]]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Fusions", y.intersp = y.int, x.intersp = x.int)
   }
   if(!is.null(categorical_data)){
     if(length(categorical_data_colors) <= 7){
-      legend(x = 0.6, y=1, names(categorical_data_colors), fill = unlist(categorical_data_colors), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Categorical Data", y.intersp = y.int, x.intersp = x.int)
+      legend(x = 1, y=1.4, names(categorical_data_colors), fill = unlist(categorical_data_colors), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Categorical Data", y.intersp = y.int, x.intersp = x.int)
     }else if(length(categorical_data_colors) > 5 & length(categorical_data_colors) <= 10){
-      legend(x = 0.6, y=1, names(categorical_data_colors[1:5]), fill = unlist(categorical_data_colors[1:5]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Categorical Data", y.intersp = y.int, x.intersp = x.int)
-      legend(x = 0.75, y=1, names(categorical_data_colors[6:10]), fill = unlist(categorical_data_colors[6:10]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "", y.intersp = y.int, x.intersp = x.int)
+      legend(x = 1, y=1.4, names(categorical_data_colors[1:5]), fill = unlist(categorical_data_colors[1:5]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Categorical Data", y.intersp = y.int, x.intersp = x.int)
+      legend(x = 1.5, y=1.4, names(categorical_data_colors[6:10]), fill = unlist(categorical_data_colors[6:10]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "", y.intersp = y.int, x.intersp = x.int)
     }
-    else if(length(categorical_data_colors) > 10 ){
-      legend(x = 0.6, y=1, names(categorical_data_colors[1:5]), fill = unlist(categorical_data_colors[1:5]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Categorical Data", y.intersp = y.int, x.intersp = x.int)
-      legend(x = 0.75, y=1, names(categorical_data_colors[6:10]), fill = unlist(categorical_data_colors[6:10]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "", y.intersp = y.int, x.intersp = x.int)
-      legend(x = 0.9, y=1, names(categorical_data_colors[11:length(categorical_data_colors)]), fill = unlist(categorical_data_colors[11:length(categorical_data_colors)]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "", y.intersp = y.int, x.intersp = x.int)
-    }
+    # else if(length(categorical_data_colors) > 10 ){
+    #   legend(x = 1, y=1.4, names(categorical_data_colors[1:5]), fill = unlist(categorical_data_colors[1:5]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "Categorical Data", y.intersp = y.int, x.intersp = x.int)
+    #   legend(x = 1.5, y=1.4, names(categorical_data_colors[6:10]), fill = unlist(categorical_data_colors[6:10]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "", y.intersp = y.int, x.intersp = x.int)
+    #   legend(x = 1, y=1, names(categorical_data_colors[11:length(categorical_data_colors)]), fill = unlist(categorical_data_colors[11:length(categorical_data_colors)]), horiz = F, border = F, cex = legend.cex, bty = "n" , title = "", y.intersp = y.int, x.intersp = x.int)
+    #}
   }
 
-    legend(x = 1, y = 1.3,c("Mutations", "SCNA", "Fusion"), fill = c("#424395", "#51B224", "#FF9700"), bty="n", cex = legend.cex, border = F, title="", y.intersp = y.int, x.intersp = x.int)
+    legend(x = 1, y = 1.2,c("Mutations", "SCNA", "Fusion"), fill = c("#424395", "#51B224", "#FF9700"), bty="n", cex = legend.cex, border = F, title="", y.intersp = y.int, x.intersp = x.int)
 
   close.screen(all.screens = TRUE)
 
