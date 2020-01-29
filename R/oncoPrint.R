@@ -201,7 +201,7 @@ oncoPrint <- function(data = NULL, sort=TRUE, convert = TRUE, total_samples = NU
   alterations.c <- sampleSort(alterations.c, geneOrder = geneName, annotations = annotation, annotation_order = annotation_order)
   alterations <- alterations[row.names(alterations.c), colnames(alterations.c)]
   
-  if(sample_order){
+  if(!is.null(sample_order)){
     message("sample order provided, ignoring sample order based on gene alterations.\n")
     alterations <- alterations[ , sample_order] 
   }
