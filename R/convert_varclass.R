@@ -39,6 +39,9 @@ convert_varclass <- function(df, class_lookup= c('splicing'="Splicing", 'stop'="
   if(sum(grepl("IntragenicDeletion", df$VarClass) > 0)){
     df[grep("IntragenicDeletion", df$VarClass), ]["VarClass"] <- class_lookup['IntragenicDeletion']
   }
+  if(sum(grepl("silent", df$VarClass) > 0)){
+    df[grep("silent_SNV", df$VarClass), ]["VarClass"] <- class_lookup['Silent']
+  }
   
   cat("Finished converting variant classes\n")
   return(df)
