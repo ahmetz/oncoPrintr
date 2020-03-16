@@ -182,7 +182,7 @@ oncoPrint <- function(data = NULL,
   for (i in 1:nrow(alterations)){
     for(j in 1:ncol(alterations)){
       altered <- alterations[i, j]
-      
+      cat(alterations[i,j] + "\n")
       if(!is.na(altered)){ # there is an alteration
         if(grepl("," ,altered)){ # alteration is a mix of two seperated by a comma
           alts <- unlist(stringr::str_split(altered, ",")) # split the alterations
