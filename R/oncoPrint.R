@@ -588,7 +588,7 @@ oncoPrint <- function(data = NULL,
   rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
   rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
   rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA)
-  rect(oncoCords.borders[, "xleft"], oncoCords.borders[, "ybottom"],oncoCords.borders[, "xright"], oncoCords.borders[, "ytop"], col=NA, border="black")
+  rect(oncoCords.borders[, "xleft"], oncoCords.borders[, "ybottom"],oncoCords.borders[, "xright"], oncoCords.borders[, "ytop"], col=NA, border=colors.border)
   if(!is.null(categorical_data)){
     rect(oncoCords.catData[, "xleft"], oncoCords.catData[, "ybottom"],oncoCords.catData[, "xright"], oncoCords.catData[, "ytop"], col=colors.cat, border=NA);
   }
