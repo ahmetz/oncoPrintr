@@ -37,7 +37,7 @@ oncoPrint <- function(data = NULL,
                       categorical_data_colors = NULL, 
                       annotation_colors = NULL, 
                       categorical_data_order = NULL, 
-                      onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#ffaa00", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", Silent = "#75430c", del = "red", LOH = "#D17878", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", Fusion =  "#B641F9", Pathogenic="white", Heterozygous = "#7f7f7f", LossOfMutant = "#7B93A5", Biallelic = "#000000"), 
+                      onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#ffaa00", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", Silent = "#75430c", del = "red", LOH = "#D17878", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", NotApplicable = "azure1", Fusion =  "#B641F9", Pathogenic="white", Heterozygous = "#7f7f7f", LossOfMutant = "#7B93A5", Biallelic = "#000000"), 
                       alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Pathogenic = 3,  Nonsense = 2.8, Frameshift = 2.6, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1, Silent = 2, Heterozygous = 2, LossOfMutant = 1, Biallelic = 3), 
                       printSamples = F, 
                       xpadding = 0.1, 
@@ -286,7 +286,7 @@ oncoPrint <- function(data = NULL,
   scna_alterations <- c("Amplification" , "Deletion" , "homodel" , "del" , "CNLOH" , "LOH")
   misc_alterations <- c("Present" , "NotPresent" , "NotTested", "Yes" , "No", "Unknown")
   fusion_alterations <- c("Fusion")
-  border_alterations <- c("Pathogenic", "Heterozygous", "Biallelic", "LossOfMutant", "Unknown")
+  border_alterations <- c("Pathogenic", "Heterozygous", "Biallelic", "LossOfMutant", "NotApplicable")
   
   barplot_data <- matrix(rep(0, 3*ngenes), nrow = 3)
   colnames(barplot_data) <- row.names(alterations)
@@ -584,7 +584,7 @@ oncoPrint <- function(data = NULL,
   par(mar=c(3,5,0,0), mgp=c(3, 0.7, 0))
   plot(c(0, nsamples), c(0, ngenes), type="n", main="", xaxt = "n", ylab = "", yaxt = "n", xlab="Samples", frame.plot = F);
 
-  rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#DCD9D3", border=NA);
+  rect(oncoCords.base[, "xleft"], oncoCords.base[, "ybottom"],oncoCords.base[, "xright"], oncoCords.base[, "ytop"], col="#EAEAEA", border=NA);
   rect(oncoCords.scna[, "xleft"], oncoCords.scna[, "ybottom"],oncoCords.scna[, "xright"], oncoCords.scna[, "ytop"], col=colors.scna, border=NA);
   rect(oncoCords.fusion[, "xleft"], oncoCords.fusion[, "ybottom"],oncoCords.fusion[, "xright"], oncoCords.fusion[, "ytop"], col=colors.fusion, border=NA);
   rect(oncoCords[, "xleft"], oncoCords[, "ybottom"],oncoCords[, "xright"], oncoCords[, "ytop"], col=colors, border=NA)
