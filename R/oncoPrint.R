@@ -38,7 +38,7 @@ oncoPrint <- function(data = NULL,
                       annotation_colors = NULL, 
                       categorical_data_order = NULL, 
                       onco_colors = list(Mutation = "#26A818", Missense = "#26A818", Nonsense = "black", Splicing = "#ffaa00", Frameshift = "#A05E35" , Promoter = "#2986E2", InFrame = "#F26529", Present = "darkorchid2", NotPresent = "#DCD9D3", NotTested = "darkgrey", Silent = "#75430c", del = "red", LOH = "#D17878", homodel = "brown4", CNLOH =  "deepskyblue", Amplification = "#EA2E49", Deletion = "#174D9D", Yes = "#155B6B", No = "#12C8F9", Unknown = "azure1", NotApplicable = "azure1", Fusion =  "#B641F9", Pathogenic="white", Heterozygous = "#7f7f7f", LossOfMutant = "#7B93A5", Biallelic = "#000000"), 
-                      alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Pathogenic = 3,  Nonsense = 2.8, Frameshift = 2.6, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1, Silent = 2, Heterozygous = 2, LossOfMutant = 1, Biallelic = 3), 
+                      alteration_score = list(Amplification = 5, Fusion = 4.5, Deletion = 4, Pathogenic = 3,  Nonsense = 2.8, Frameshift = 2.6, Splicing = 2.5, InFrame = 2, Promoter = 2, Mutation =1, Missense=1, Present = 1, NotTested = 0, None = 0, NotPresent = 0, NotApplicable = 0, Yes = 0, No = 0, del = 3, homodel = 2, LOH = 1.5, CNLOH = 1, Silent = 2, Heterozygous = 2, LossOfMutant = 1, Biallelic = 3), 
                       printSamples = F, 
                       xpadding = 0.1, 
                       ypadding = 0.1) {
