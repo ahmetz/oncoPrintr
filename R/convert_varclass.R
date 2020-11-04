@@ -16,7 +16,7 @@
 #' @export 
 #'
 #' @examples TODO
-convert_varclass <- function(df, class_lookup= c('splicing'="Splicing", 'stop'="Nonsense", 'nonsynonymous'="Missense", 'nonframeshift'="InFrame", 'frameshift'="Frameshift", 'upstream'="Promoter", 'IntragenicDeletion'="Deletion", "Translation_Start_Site"="Frameshift")){
+convert_varclass <- function(df, class_lookup= c('splicing'="Splicing", 'stop'="Nonsense", 'nonsynonymous'="Missense", 'nonframeshift'="InFrame", 'frameshift'="Frameshift", 'upstream'="Promoter", 'IntragenicDeletion'="Deletion", 'Translation_Start_Site'="Frameshift")){
   cat("Converting variant classes\n")
   if (sum(grepl("splicing", df$VarClass) > 0)){
     df[grep("splicing", df$VarClass), ]["VarClass"] <- class_lookup['splicing']
@@ -41,6 +41,9 @@ convert_varclass <- function(df, class_lookup= c('splicing'="Splicing", 'stop'="
   }
   if(sum(grepl("silent", df$VarClass) > 0)){
     df[grep("silent_SNV", df$VarClass), ]["VarClass"] <- class_lookup['Silent']
+  }
+  if(sum(grepl("Translation_Start_Site", df$VarClass) > 0)){
+    df[grep("Translation_Start_Site", df$VarClass), ]["VarClass"] <- class_lookup['Translation_Start_Site']
   }
   
   cat("Finished converting variant classes\n")
